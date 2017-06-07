@@ -68,14 +68,14 @@ ga('create','UA-27126624-1','auto');ga('send','pageview');</script></head><body>
 <p>所以，再回到 <code>App.vue</code>，這裏將原本的 <code>http://data.taipei/youbike</code> 改成 <code>/data/youbike</code>，像這樣：</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">created()&#123;</div><div class="line">  Vue.axios.get(<span class="string">'/data/youbike'</span>).then(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</div><div class="line">    <span class="built_in">console</span>.log(response.data)</div><div class="line">  &#125;)</div><div class="line">&#125;,</div></pre></td></tr></table></figure>
 <p>接著，記得要重開 dev-server，執行 <code>$ npm run dev</code> 或 <code>$ yarn dev</code> 。</p>
-<p>接著，再次打開 console 就可以看到，遠端的 youbike 資訊已經可以正確取得囉。
+<p>最後，在網頁讀取完成後，打開 console 就可以看到，遠端的 youbike 資訊已經可以正確取得囉。
 <img src="/static/img/vue-axios-ok.png"></p>
 <p>詳細的 http-proxy-middleware 設定可以參考這裡：</p>
 <ul>
 <li><a href="https://github.com/chimurai/http-proxy-middleware#http-proxy-middleware-options" target="_blank" rel="external">https://github.com/chimurai/http-proxy-middleware#http-proxy-middleware-options</a></li>
 <li><a href="https://vuejs-templates.github.io/webpack/proxy.html" target="_blank" rel="external">https://vuejs-templates.github.io/webpack/proxy.html</a></li>
 </ul>
-</div><script type="text/javascript" src="/js/share.js?v=0.0.1" async></script><a data-url="https://kuro.tw/posts/2017/06/07/如何在-Vue-CLI-建立的開發環境呼叫跨域遠端-RESTful-APIs/" data-id="cj3mur6yh00219ct4j7426uek" class="article-share-link">分享</a><div class="tags"><a href="/tags/vue-js/">vue.js</a></div><div class="post-nav"><a href="/posts/2017/05/30/VueJS-V2-在-v-for-列表完成分頁功能/" class="next">[VueJS-V2] 在 v-for 列表完成分頁功能 (從 v1 至 v2)</a></div><div id="disqus_thread"><div class="btn_click_load"><button class="disqus_click_btn">阅读评论 「请确保 disqus.com 可以正常加载」</button></div><script>var disqus_shortname = 'kurotw';
+</div><script type="text/javascript" src="/js/share.js?v=0.0.1" async></script><a data-url="https://kuro.tw/posts/2017/06/07/如何在-Vue-CLI-建立的開發環境呼叫跨域遠端-RESTful-APIs/" data-id="cj3mv5re5002atwt47g8gaznk" class="article-share-link">分享</a><div class="tags"><a href="/tags/vue-js/">vue.js</a></div><div class="post-nav"><a href="/posts/2017/05/30/VueJS-V2-在-v-for-列表完成分頁功能/" class="next">[VueJS-V2] 在 v-for 列表完成分頁功能 (從 v1 至 v2)</a></div><div id="disqus_thread"><div class="btn_click_load"><button class="disqus_click_btn">阅读评论 「请确保 disqus.com 可以正常加载」</button></div><script>var disqus_shortname = 'kurotw';
 var disqus_identifier = 'posts/2017/06/07/如何在-Vue-CLI-建立的開發環境呼叫跨域遠端-RESTful-APIs/';
 var disqus_title = '如何在 Vue-CLI 建立的開發環境呼叫跨域遠端 RESTful APIs';
 var disqus_url = 'https://kuro.tw/posts/2017/06/07/如何在-Vue-CLI-建立的開發環境呼叫跨域遠端-RESTful-APIs/';
