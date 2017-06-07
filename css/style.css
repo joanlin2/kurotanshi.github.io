@@ -244,8 +244,8 @@ div {
       margin: 0 0 1.234em; }
       .post .post-content p code {
         display: inline-block;
-        margin: 0 5px;
-        padding: 0 5px;
+        margin: 0 3px;
+        padding: 0 10px;
         background: #f7f8f8; }
       .post .post-content p a {
         color: #01579f;
