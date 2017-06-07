@@ -1,0 +1,908 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Kuro&#39;s Blog</title>
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="https://kuro.tw/"/>
+  <updated>2017-06-07T05:16:03.000Z</updated>
+  <id>https://kuro.tw/</id>
+  
+  <author>
+    <name>Kuro Hsu</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>[VueJS-V2] 在 v-for 列表完成分頁功能 (從 v1 至 v2)</title>
+    <link href="https://kuro.tw/posts/2017/05/30/VueJS-V2-%E5%9C%A8-v-for-%E5%88%97%E8%A1%A8%E5%AE%8C%E6%88%90%E5%88%86%E9%A0%81%E5%8A%9F%E8%83%BD/"/>
+    <id>https://kuro.tw/posts/2017/05/30/VueJS-V2-在-v-for-列表完成分頁功能/</id>
+    <published>2017-05-30T09:00:00.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>Vue 2 都發行半年多了，直到最近有網友留言這才想起一直沒更新裡面的內容，囧。</p>
+<p>延續上回 <a href="https://kuro.tw/posts/2016/05/30/vuejs-in-v-for-through-the-filter-in-the-list-complete-search-and-page-functions/">[VueJS] 在 v-for 列表中透過 filter 完成搜尋與分頁的功能</a> 這篇的說明，
+這次我們來看看，自從 <span style="color: red">VueJS 更新到 V2 拿掉了內建的 filterBy、limitBy 等好用的 filter 後</span>，要如何修改才能做到分頁的功能。</p>
+<p>首先看到原本 V1 的範例，是這樣的，這裡透過 <code>limitBy countOfPage pageStart</code> 來完成分頁，如下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">tr</span> <span class="attr">v-for</span>=<span class="string">"r in rows </span></span></div><div class="line">  | filterBy filter_name in 'name' </div><div class="line">  | recordLength 'filteredRowCount' </div><div class="line">  | limitBy countOfPage pageStart "&gt;</div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; (currPage-1) * countOfPage + $index + 1 &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.name &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.age &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.gender &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">tr</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>因為從 V2 開始，<code>filterBy</code> 、 <code>limitBy</code> 、 <code>orderBy</code> 都沒有了，所以我們直接移除掉：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">tr</span> <span class="attr">v-for</span>=<span class="string">"r in rows"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; (currPage-1) * countOfPage + $index + 1 &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.name &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.age &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.gender &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">tr</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>這時應該會出現錯誤，因為 <code>$index</code> 的寫法也更新了，所以改一下 <code>v-for</code> 的內容：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">tr</span> <span class="attr">v-for</span>=<span class="string">"(r, index) in rows"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; (currPage-1) * countOfPage + index + 1 &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.name &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.age &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.gender &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">tr</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>到目前為止，至少可以看到程式正常運作，但相對地<span style="color: red">分頁與搜尋的功能也沒了</span>，所以接下來先來處理<strong>搜尋</strong>的部份。</p>
+<hr>
+
+<p>首先，在 <code>computed</code> 屬性，我們新增一個叫做 <code>filteredRows</code> 的屬性，用來處理與 <code>filter_name</code> 比對後的結果：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">filteredRows: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">  <span class="comment">// 因為 JavaScript 的 filter 有分大小寫，</span></div><div class="line">  <span class="comment">// 所以這裡將 filter_name 與 rows[n].name 通通轉小寫方便比對。</span></div><div class="line">  <span class="keyword">var</span> filter_name = <span class="keyword">this</span>.filter_name.toLowerCase();</div><div class="line">  </div><div class="line">  <span class="comment">// 如果 filter_name 有內容，回傳過濾後的資料，否則將原本的 rows 回傳。</span></div><div class="line">  <span class="keyword">return</span> ( <span class="keyword">this</span>.filter_name.trim() !== <span class="string">''</span> ) ? </div><div class="line">      <span class="keyword">this</span>.rows.filter(<span class="function"><span class="keyword">function</span>(<span class="params">d</span>)</span>&#123; <span class="keyword">return</span> d.name.toLowerCase().indexOf(filter_name) &gt; <span class="number">-1</span>; &#125;) : </div><div class="line">      <span class="keyword">this</span>.rows;</div><div class="line">&#125;,</div></pre></td></tr></table></figure>
+<p>然後將 html 內的 <code>rows</code> 換成 <code>filteredRows</code></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">tr</span> <span class="attr">v-for</span>=<span class="string">"(r, index) in filteredRows"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; (currPage-1) * countOfPage + index + 1 &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.name &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.age &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.gender &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">tr</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>name 搜尋的部份到這裡就算完成了，接著回頭來處理<strong>分頁</strong>。</p>
+<hr>
+
+<p>處理分頁之前，先看到底下的分頁按鈕， <code>n in range</code> 在 V2 的寫法也有不同，原本的索引會由 0 開始，但從 V2 開始會由 1 開始，所以需要把原本的：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"pagination"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">ul</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-bind:class</span>=<span class="string">"&#123;'disabled': (currPage === 1)&#125;"</span> </span></div><div class="line">        @<span class="attr">click.prevent</span>=<span class="string">"setPage(currPage-1)"</span>&gt;<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span>&gt;</span>Prev<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-for</span>=<span class="string">"n in totalPage"</span></span></div><div class="line">        <span class="attr">v-bind:class</span>=<span class="string">"&#123;'active': (currPage === (n+1))&#125;"</span> </div><div class="line">        @<span class="attr">click.prevent</span>=<span class="string">"setPage(n+1)"</span>&gt;<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span>&gt;</span>&#123;&#123;n+1&#125;&#125;<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-bind:class</span>=<span class="string">"&#123;'disabled': (currPage === totalPage)&#125;"</span> </span></div><div class="line">        @<span class="attr">click.prevent</span>=<span class="string">"setPage(currPage+1)"</span>&gt;<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span>&gt;</span>Next<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>改寫成：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"pagination"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">ul</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-bind:class</span>=<span class="string">"&#123;'disabled': (currPage === 1)&#125;"</span> </span></div><div class="line">        @<span class="attr">click.prevent</span>=<span class="string">"setPage(currPage-1)"</span>&gt;<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span>&gt;</span>Prev<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-for</span>=<span class="string">"n in totalPage"</span></span></div><div class="line">        <span class="attr">v-bind:class</span>=<span class="string">"&#123;'active': (currPage === (n))&#125;"</span> </div><div class="line">        @<span class="attr">click.prevent</span>=<span class="string">"setPage(n)"</span>&gt;<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span>&gt;</span>&#123;&#123;n&#125;&#125;<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-bind:class</span>=<span class="string">"&#123;'disabled': (currPage === totalPage)&#125;"</span> </span></div><div class="line">        @<span class="attr">click.prevent</span>=<span class="string">"setPage(currPage+1)"</span>&gt;<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span>&gt;</span>Next<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>顯示就會是正常的從 1 開始了。</p>
+<p>再來處理顯示筆數時，需要的會有 <code>pageStart</code> 、 <code>countOfPage</code> 與 <code>totalPage</code> 這三個部分，其中 <code>totalPage</code> 會跟先前提到的 <strong>搜尋</strong> 比較有關係，因為總頁數不對，算出來的分頁也會有問題。</p>
+<p>原本的 <code>totalPage</code> 長這樣：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">totalPage: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">  <span class="keyword">if</span>( <span class="keyword">this</span>.filter_name.trim() === <span class="string">''</span> ) &#123;</div><div class="line">      <span class="keyword">return</span> <span class="built_in">Math</span>.ceil(<span class="keyword">this</span>.rows.length / <span class="keyword">this</span>.countOfPage);</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">else</span>&#123;</div><div class="line">      <span class="keyword">return</span> <span class="built_in">Math</span>.ceil(<span class="keyword">this</span>.filteredRowCount / <span class="keyword">this</span>.countOfPage);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>因為資料在先前都交給 <code>filteredRows</code> 處理了，所以可以改寫成
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">totalPage: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">  <span class="keyword">return</span> <span class="built_in">Math</span>.ceil(<span class="keyword">this</span>.filteredRows.length / <span class="keyword">this</span>.countOfPage);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>實際執行會發現最底下的分頁按鈕已經會隨著 Filter 的結果筆數而有所不同：</p>
+<p><img src="/static/img/v2-filter-1.png"></p>
+<p><hr>
+<img src="/static/img/v2-filter-2.png"></p>
+<p>最後，再回到處理<span style="color: red">每頁顯示資料量</span>的部分。</p>
+<p>在沒有了 <code>limitBy</code> 之後，顯示筆數的部份我們可以透過 JavaScript 的 <code>slice</code> 來處理，當然也可以寫在 <code>computed</code> 屬性。
+但這個範例只是單純在顯示作切換，所以可以直接寫在 view 上，像這樣將 <code>filteredRows</code> 改寫成 <code>filteredRows.slice(pageStart, pageStart + countOfPage)</code>：</p>
+<p>對 <code>slice</code> 不熟的朋友可參考： MDN: <a href="https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/slice" target="_blank" rel="external">Array.prototype.slice()</a></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">tr</span> <span class="attr">v-for</span>=<span class="string">"(r, index) in filteredRows.slice(pageStart, pageStart + countOfPage)"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; (currPage-1) * countOfPage + index + 1 &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.name &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.age &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.gender &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">tr</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>就完成了從 V1 更新到 V2 的過程了。</p>
+<p>完整更新的範例可在此參考：<br>
+<a class="jsbin-embed" href="http://jsbin.com/kusafiqaka/embed?html,js,output" target="_blank" rel="external">JS Bin on jsbin.com</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Vue 2 都發行半年多了，直到最近有網友留言這才想起一直沒更新裡面的內容，囧。&lt;/p&gt;
+&lt;p&gt;延續上回 &lt;a href=&quot;https://kuro.tw/posts/2016/05/30/vuejs-in-v-for-through-the-filter-in-the-l
+    
+    </summary>
+    
+      <category term="vue.js" scheme="https://kuro.tw/categories/vue-js/"/>
+    
+    
+      <category term="vue.js" scheme="https://kuro.tw/tags/vue-js/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>[筆記] Google 街景 API 加入圖標與預設角度計算</title>
+    <link href="https://kuro.tw/posts/2017/04/04/%E7%AD%86%E8%A8%98-Google-%E8%A1%97%E6%99%AF-API-%E5%8A%A0%E5%85%A5%E5%9C%96%E6%A8%99%E8%88%87%E8%A7%92%E5%BA%A6%E8%A8%88%E7%AE%97/"/>
+    <id>https://kuro.tw/posts/2017/04/04/筆記-Google-街景-API-加入圖標與角度計算/</id>
+    <published>2017-04-04T07:10:00.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>相信大家都知道 Google Map 在多年以前就開放了「街景檢視」這樣的服務，當然 Google Map API 也提供了給開發者使用相關的 API 服務：「<a target="_blank" href="https://developers.google.com/maps/documentation/javascript/streetview">Street View Service</a>」來開發地圖的應用。</p>
+<p>除了原本在 Google Map 上面就有的街景檢視之外，透過 Street View API 開發者可以自由地在街景地圖上加入標示項，作法就跟平時在地圖上加入 marker 一樣：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> marker = <span class="keyword">new</span> google.maps.Marker(&#123;</div><div class="line">  <span class="attr">map</span>: map,</div><div class="line">  <span class="attr">icon</span>: <span class="string">'//chart.googleapis.com/chart?chst=d_map_pin_icon&amp;chld=train|ffff00'</span>,</div><div class="line">  <span class="attr">position</span>: &#123;<span class="attr">lat</span>: <span class="number">25.051269</span>, <span class="attr">lng</span>: <span class="number">121.512386</span>&#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>如下圖黃色 icon：
+<img src="/static/img/map-marker.png"></p>
+<p>這個時候我們切換成街景檢視的時候，你會發現還需要自己手動調整角度才能找到 icon 的位置：
+<br>(如下地圖，可按右下角按鈕切換街景)</p>
+<iframe style="border: 1px solid #aaa; width: 720px; height: 300px;" src="https://kuro.tw/demo-pages/maps/map-add-marker.html"></iframe>
+
+<p>需要將視角往左邊移動後才能找到 icon 的位置。</p>
+<hr>
+
+<p>那麼，是否有更好的方式可以讓 Google 街景可以自動判斷視角方向呢？</p>
+<p>有的，可以利用 Google Map 所提供的 <a target="_blank" href="https://developers.google.com/maps/documentation/javascript/geometry">Geometry Library</a> 來協助我們計算兩點之間的角度。</p>
+<p>在 Google Maps API 內，「方向」是以與正北的角度來定義，也就是從正北 (0 度) 的順時針方向計算的角度，可以使用 <code>computeHeading()</code> 方法，將兩個 <code>from</code> 和 <code>to</code> 的 LatLng 物件傳遞給它，來計算兩個位置之間的方向。</p>
+<p>如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> heading = google.maps.geometry.spherical.computeHeading(from_latLng, target_latlng);</div></pre></td></tr></table></figure>
+<p><code>google.maps.geometry.spherical.computeHeading( )</code> 就會回傳兩點之間的角度，接著，我們就可以透過
+<code>panorama.setPov({ heading: heading, pitch: 0 });</code> 來指定街景的預設角度了。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;相信大家都知道 Google Map 在多年以前就開放了「街景檢視」這樣的服務，當然 Google Map API 也提供了給開發者使用相關的 API 服務：「&lt;a target=&quot;_blank&quot; href=&quot;https://developers.google.com/ma
+    
+    </summary>
+    
+      <category term="Google Map" scheme="https://kuro.tw/categories/Google-Map/"/>
+    
+    
+      <category term="google map" scheme="https://kuro.tw/tags/google-map/"/>
+    
+      <category term="street map api" scheme="https://kuro.tw/tags/street-map-api/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>透過 Vue-CLI 建置專案時，自動切換 devtools 的 debug 環境</title>
+    <link href="https://kuro.tw/posts/2016/12/08/%E9%80%8F%E9%81%8E-VueCLI-%E5%BB%BA%E7%BD%AE%E5%B0%88%E6%A1%88%E6%99%82%EF%BC%8C%E8%87%AA%E5%8B%95%E5%88%87%E6%8F%9B-devtools-%E7%9A%84-debug-%E7%92%B0%E5%A2%83/"/>
+    <id>https://kuro.tw/posts/2016/12/08/透過-VueCLI-建置專案時，自動切換-devtools-的-debug-環境/</id>
+    <published>2016-12-08T03:40:00.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>Vue 提供了相當好用的 debug 工具 (Chrome 套件)， <a href="https://chrome.google.com/webstore/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd" target="_blank" rel="external">Vue.js devtools</a>，在安裝之後當你用 Chrome 開啟 Vue 專案時，Chrome 的開發者工具會多出一個 Vue 的 Tab，然後把 Vue Instance 裡的屬性通通列出來：</p>
+<p><img src="/static/img/vue-tool-screenshot.png"></p>
+<p>在預設開啟 debug mode 時，按下 Vue devtools 的 icon 你會看到這樣畫面：
+<img src="/static/img/vue-tool-on.png"></p>
+<p>這時候打開 Chrome 開發者工具， vue 專案中所有 Instance 的屬性資料通通一覽無遺。</p>
+<hr>
+
+<p>但是當專案完成要上線的時候，就應該要將 debug mode 關閉，尤其在屬性可能會存有較為機敏性資料的時候。
+關閉的方式也很簡單，加上這兩行就可以了：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Vue.config.debug = <span class="literal">false</span>;</div><div class="line">Vue.config.devtools = <span class="literal">false</span>;</div></pre></td></tr></table></figure>
+<p>關閉後，再開啟 Vue 專案，雖然 icon 偵測到 Vue.js 會亮起來，但是你會看到這樣訊息：
+<img src="/static/img/vue-tool-disabled.png"></p>
+<p>這時候 Chrome 開發者工具的 Vue tab 就不會出現了。</p>
+<hr>
+
+<p>但是，在建置專案的時候，常常會忘記手動調整 debug mode，導致上線的專案會是開啟 debug mode 的版本，
+是否可以在 webpack 啟動的時候自動判斷目前環境呢？</p>
+<p>以 Vue-CLI 提供的 package.json 為例，他提供了兩個預設的 scripts， dev 用在開發專案時使用，而 build 則用於建置 production 使用：
+<img src="/static/img/vue-package-json.png"></p>
+<p>圖中可以看到，在 build 模式下多了 <code>NODE_ENV=production</code> 這個參數。</p>
+<p>這時候我們就可以利用 <code>NODE_ENV</code> 這個參數來判斷使否開啟 debug mode：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">'vue'</span></div><div class="line"><span class="keyword">import</span> App <span class="keyword">from</span> <span class="string">'./App.vue'</span></div><div class="line"></div><div class="line"><span class="keyword">const</span> isDebug_mode = process.env.NODE_ENV !== <span class="string">'production'</span>;</div><div class="line"></div><div class="line">Vue.config.debug = isDebug_mode;</div><div class="line">Vue.config.devtools = isDebug_mode;</div></pre></td></tr></table></figure>
+<p>這樣 <code>Vue.config.debug</code> 的版本就會自動依照執行階段的不同而有不同的設定了。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Vue 提供了相當好用的 debug 工具 (Chrome 套件)， &lt;a href=&quot;https://chrome.google.com/webstore/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd&quot; ta
+    
+    </summary>
+    
+      <category term="vue.js" scheme="https://kuro.tw/categories/vue-js/"/>
+    
+    
+      <category term="vue.js" scheme="https://kuro.tw/tags/vue-js/"/>
+    
+      <category term="webpack" scheme="https://kuro.tw/tags/webpack/"/>
+    
+      <category term="devtools" scheme="https://kuro.tw/tags/devtools/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>利用 Yarn 安裝 Vue-cli</title>
+    <link href="https://kuro.tw/posts/2016/10/13/%E5%88%A9%E7%94%A8-yarn-%E5%AE%89%E8%A3%9D-vue-cli/"/>
+    <id>https://kuro.tw/posts/2016/10/13/利用-yarn-安裝-vue-cli/</id>
+    <published>2016-10-13T03:49:07.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>這兩天 JavaScript 圈子的最大新聞應該就是 Facebook 發布了一套新的 JavaScript 套件管理工具 Yarn，感覺來勢洶洶勢不可擋。
+實際花了一點時間試用，表現的確也比過去 npm 好很多，尤其過去 <code>npm install</code> 速度過慢，套件相依衝突的問題，目前在 Yarn 還沒遇到。 即使是剛開始 <code>yarn run scripts</code> 無法帶入參數的問題，在發布的第二天也快速地更新 (v0.15.1) 解決了。 👍</p>
+<p><img src="/static/img/yarn-logo.png"></p>
+<p>有關 Yarn 介紹的部分，已經有其他前輩分享了，推薦可以看看這篇 <a href="https://medium.com/@jackypan1989/%E5%8F%96%E4%BB%A3-npm-%E7%9A%84%E6%96%B0%E5%88%A9%E5%99%A8-yarn-7d97f2f409b9#.pu0jrdcc4" target="_blank" rel="external">取代 npm 的新利器 Yarn</a>。</p>
+<p>既然 Yarn 號稱可以用來取代 npm，那麼身為 Vue 的愛好者，也想馬上來試試 <a href="https://github.com/vuejs/vue-cli" target="_blank" rel="external">Vue-cli</a> 這套 Vue 的樣板工具包是否也可以透過 yarn 來單獨執行。</p>
+<p><del>既然要取代 npm，那麼第一件事情就是把 npm 整包幹掉</del>，關於刪掉 npm modules 的過程我是參考 stackoverflow 的這篇:
+<a href="http://stackoverflow.com/questions/9283472/command-to-remove-all-npm-modules-globally" target="_blank" rel="external">Command to remove all npm modules globally?</a>，但實際上 Yarn 與 npm 是可以和平共存的，不一定要把 npm 幹掉才能跑 Yarn ，這裡只是想簡單做個試驗，啾咪 ^.&lt;</p>
+<p>然後安裝 Yarn。 執行 <code>curl -o- -L https://yarnpkg.com/install.sh | bash</code> 即可。</p>
+<hr>
+
+<h3 id="第一步：安裝-vue-cli"><a href="#第一步：安裝-vue-cli" class="headerlink" title="第一步：安裝 vue-cli"></a>第一步：安裝 vue-cli</h3><p>很簡單，把原本的  <code>npm install -g vue-cli</code> 改成 <code>yarn global add vue-cli</code> 就可以了。執行的時候像這樣：
+<img src="/static/img/yarn-vue-1.png"></p>
+<p>而安裝完畢後，執行 <code>yarn vue</code> 應該可以看到這樣的畫面。
+<img src="/static/img/yarn-vue-2.png"></p>
+<p>每執行完一個指令還會告訴你它跑了多久喔<del>，非常囂張 (誤)</del>。</p>
+<h3 id="第二步：初始化-Vue-專案"><a href="#第二步：初始化-Vue-專案" class="headerlink" title="第二步：初始化 Vue 專案"></a>第二步：初始化 Vue 專案</h3><p>接著，就來初始化我們的 Vue 專案。 Vue-cli 這個 scaffolding 工具官方目前提供了幾種 template 讓開發者自行選擇，
+像是大家常見的 webpack、browserify 都有。當然也可以挑選什麼都沒有的 simple: 就是最基本的 Vue 專案這樣。
+如果想更詳細了解各種 template 細節的話，可以到 vue-templates 的 <a href="https://github.com/vuejs-templates" target="_blank" rel="external">Repo</a> 去看。</p>
+<p>這裡我就選擇拿「<a href="https://github.com/vuejs-templates/webpack-simple" target="_blank" rel="external">webpack-simple</a>」當範例。</p>
+<p>執行 <code>yarn vue init webpack-simple my-project</code>
+<img src="/static/img/yarn-vue-3.png"></p>
+<p>因為 VueJS 目前已經發佈至 2.0 版了，所以你會看到 Vue-cli 很貼心地提醒你現在安裝的是<span style="color: red;"> 2.0 的版本</span>。
+若你想安裝的是 1.x 版本的話，可以改成 <br> <code>yarn vue init webpack-simple#1.0 my-project</code> 即可。</p>
+<p>然後，Vue-cli 會幫我們建立一個新目錄 <code>my-project</code>。</p>
+<p>透過 <code>cd my-project</code> 切換到新專案目錄後，我們將原本的 <code>npm install</code> 改成直接執行 <code>yarn</code> 即可。
+<img src="/static/img/yarn-vue-4.png"></p>
+<h3 id="第三步：啟動並執行-vue-專案"><a href="#第三步：啟動並執行-vue-專案" class="headerlink" title="第三步：啟動並執行 vue 專案"></a>第三步：啟動並執行 vue 專案</h3><p>最後，直接執行 <code>yarn run dev</code> 應該會看到像這樣的畫面。
+<img src="/static/img/yarn-vue-5.png"></p>
+<p>打開你的瀏覽器連到 <code>http://localhost:8080/</code> 看到 <code>Hello Vue!</code> 的字樣就代表成功執行囉！
+<img src="/static/img/yarn-vue-6.png"></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;這兩天 JavaScript 圈子的最大新聞應該就是 Facebook 發布了一套新的 JavaScript 套件管理工具 Yarn，感覺來勢洶洶勢不可擋。
+實際花了一點時間試用，表現的確也比過去 npm 好很多，尤其過去 &lt;code&gt;npm install&lt;/code&gt; 
+    
+    </summary>
+    
+      <category term="vue.js" scheme="https://kuro.tw/categories/vue-js/"/>
+    
+    
+      <category term="vue.js" scheme="https://kuro.tw/tags/vue-js/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>[筆記] 透過 Composition Events 增強非拉丁語系輸入法對輸入框的支援</title>
+    <link href="https://kuro.tw/posts/2016/10/11/%E7%AD%86%E8%A8%98-%E9%80%8F%E9%81%8E-Composition-Events-%E5%A2%9E%E5%BC%B7%E9%9D%9E%E6%8B%89%E4%B8%81%E8%AA%9E%E7%B3%BB%E8%BC%B8%E5%85%A5%E6%B3%95%E5%B0%8D%E8%BC%B8%E5%85%A5%E6%A1%86%E7%9A%84%E6%94%AF%E6%8F%B4/"/>
+    <id>https://kuro.tw/posts/2016/10/11/筆記-透過-Composition-Events-增強非拉丁語系輸入法對輸入框的支援/</id>
+    <published>2016-10-11T04:57:30.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>最近在爬 Vue 的原始碼的時候，意外發現兩個沒看過的 event：<code>compositionstart</code> 與 <code>compositionend</code>。 查了一下 MDN 才發現這些叫做「<a href="https://developer.mozilla.org/en-US/docs/Web/API/CompositionEvent" title="Composition Events" target="_blank" rel="external">Composition Events</a>」的 event 是從 DOM Level 3 之後才新增的。</p>
+<p>介紹 Composition Events 之前先來談談 DOM API 過去對輸入框偵測變化的幾個方式。</p>
+<p>一般來說，常見的表單輸入框如: <code>&lt;input type=&quot;text&quot;&gt;</code> 如果要動態監聽輸入框的文字變化時，
+大多會透過監聽 <code>keydown</code>、<code>keypress</code>、<code>keyup</code> 等鍵盤事件來判斷 value 是否變動，但如果是透過複製貼上之類的操作，就無法透過鍵盤事件來判斷。</p>
+<p>而即使是 <code>change</code> 事件則是要在使用者改變內容，且<span style="color: red;">焦點離開輸入框的前一刻才會被觸發</span>。
+所以後來有了 <code>input</code> 事件， input 事件會在<span style="color: red;">輸入框的內容被改變時即時觸發</span>，確實也解決了過去在 onChange 以及鍵盤相關事件帶來的不少問題。</p>
+<p>新的問題來了！</p>
+<p>通常像這樣的搜尋框，我們會用類似 autocomplete 的方式給使用者搜尋建議 (以 google 為例)：
+<img src="/static/img/google-autocompleted.png"></p>
+<p>如上圖，在輸入中文的時候，通常會需要透過注音之類的輸入法來做拼字，但是在大部分的情況下，自動給「注音符號」或是「拼音文字」搜尋建議是沒有太大意義的。</p>
+<p>回到主題。這個時候就需要透過 <strong>Composition Events</strong> 來為輸入框做增強。
+透過 Composition Events 我們可以觀察使用者在輸入框內開啟輸入法 (Input Method Editor, IME) 時，組字或選字的狀態。</p>
+<p>Composition Events 提供三個事件給開發者監聽：分別是 <code>compositionstart</code> 、 <code>compositionend</code> ，以及 <code>compositionupdate</code>。</p>
+<ul>
+<li><code>compositionstart</code>: 輸入框內開啟輸入法，且正在拼字時觸發。</li>
+<li><code>compositionupdate</code>:輸入框內開啟輸入法，且正在拼字或選字時更改了內容時觸發。</li>
+<li><code>compositionend</code>: 輸入框內開啟輸入法，拼字或選字完成，正要送出至輸入框時觸發。</li>
+</ul>
+<p></p><p></p>
+執行的時候像這樣：
+<img src="/static/img/composition-demo.png"><p></p>
+<p>可以看到，如果要確認使用者輸入完成並送出文字時，可以透過 <code>compositionend</code> 來做最後確認。<br>
+附上 JSBin Demo: <a href="http://jsbin.com/mofepimiqo/1/edit?js,console,output" target="_blank" rel="external">http://jsbin.com/mofepimiqo/1/edit?js,console,output</a></p>
+<p>最後則是大家都很關心的瀏覽器支援度。以目前來說，mobile 平台上可能還不太 ok，但是 Desktop 平台上表現看起來相當不錯，可以大膽地使用囉。
+<img src="/static/img/compositionEvent-compatibility.png"></p>
+<p></p><p class="no-space" style="margin-bottom:0">參考資料：</p><p></p>
+<ul>
+<li><a href="http://blog.zhusee.in/post/146553/enhance-ime-support-of-codemirror-with-composition-events" target="_blank" rel="external">用 Composition Event 改進 CodeMirror 對輸入法的支援</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/CompositionEvent" title="Composition Events" target="_blank" rel="external">MDN: Composition Events</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;最近在爬 Vue 的原始碼的時候，意外發現兩個沒看過的 event：&lt;code&gt;compositionstart&lt;/code&gt; 與 &lt;code&gt;compositionend&lt;/code&gt;。 查了一下 MDN 才發現這些叫做「&lt;a href=&quot;https://develope
+    
+    </summary>
+    
+      <category term="HTML" scheme="https://kuro.tw/categories/HTML/"/>
+    
+    
+      <category term="javascript" scheme="https://kuro.tw/tags/javascript/"/>
+    
+      <category term="html" scheme="https://kuro.tw/tags/html/"/>
+    
+      <category term="events" scheme="https://kuro.tw/tags/events/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>VueJS 各種資料綁定 (data binding) 的方式</title>
+    <link href="https://kuro.tw/posts/2016/10/05/VueJS-%E5%90%84%E7%A8%AE%E8%B3%87%E6%96%99%E7%B6%81%E5%AE%9A-data-binding-%E7%9A%84%E6%96%B9%E5%BC%8F/"/>
+    <id>https://kuro.tw/posts/2016/10/05/VueJS-各種資料綁定-data-binding-的方式/</id>
+    <published>2016-10-05T01:04:34.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>大部分資料是從這裡來的: <a href="https://github.com/vuejs/vue/wiki/1.0.0-binding-syntax-cheatsheet" target="_blank" rel="external">Vue 1.0.0 binding syntax cheatsheet</a>，再加上對 Vue 2.0 補充的部分。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- normal directive --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">v-if</span>=<span class="string">"ok"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- directive with argument --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">v-on:click</span>=<span class="string">"onClick"</span>&gt;</span><span class="tag">&lt;/<span class="name">button</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- v-on with argument + key modifier --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">v-on:keyup.enter</span>=<span class="string">"handleEnter"</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- literal modifier: pass literal string to directive for Vue 1.x, --&gt;</span></div><div class="line"><span class="comment">&lt;!-- but deprecated in 2.0 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">v-link.literal</span>=<span class="string">"/a/b/c"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- binding an attribute with v-bind --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">v-bind:src</span>=<span class="string">"imgSrc"</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">v-bind:href</span>=<span class="string">"baseURL + '/path'"</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- shorthand: colon for v-bind --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">:src</span>=<span class="string">"imgSrc"</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">:href</span>=<span class="string">"baseURL + '/path'"</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- shorthand: @ for v-on --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">button</span> @<span class="attr">click</span>=<span class="string">"onClick"</span>&gt;</span><span class="tag">&lt;/<span class="name">button</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- key modifier --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">input</span> @<span class="attr">keyup.enter</span>=<span class="string">"handleEnter"</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- stop/prevent modifier --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">button</span> @<span class="attr">click.stop</span>=<span class="string">"onClick"</span>&gt;</span><span class="tag">&lt;/<span class="name">button</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">form</span> @<span class="attr">submit.prevent</span>&gt;</span><span class="tag">&lt;/<span class="name">form</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- props for Vue 1.x --&gt;</span></div><div class="line"><span class="comment">&lt;!-- .once and .sync are deprecated in 2.0 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">my-comp</span></span></div><div class="line">  <span class="attr">prop</span>=<span class="string">"literal string"</span></div><div class="line">  <span class="attr">v-bind:prop</span>=<span class="string">"defaultOneWay"</span></div><div class="line">  <span class="attr">v-bind:prop.sync</span>=<span class="string">"twoWay"</span></div><div class="line">  <span class="attr">v-bind:prop.once</span>=<span class="string">"oneTime"</span>&gt;</div><div class="line"><span class="tag">&lt;/<span class="name">my-comp</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- props with one time binding for Vue 2.0 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">my-comp</span></span></div><div class="line">  <span class="attr">prop</span>=<span class="string">"literal string"</span></div><div class="line">  <span class="attr">v-bind:prop</span>=<span class="string">"defaultOneWay"</span></div><div class="line">  <span class="attr">v-once</span>&gt;</div><div class="line"><span class="tag">&lt;/<span class="name">my-comp</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- component with props and custom events, in shorthand --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">item-list</span></span></div><div class="line">  <span class="attr">:items</span>=<span class="string">"items"</span></div><div class="line">  <span class="attr">:open.sync</span>=<span class="string">"isListOpen"</span></div><div class="line">  @<span class="attr">ready</span>=<span class="string">"onItemsReady"</span></div><div class="line">  @<span class="attr">update</span>=<span class="string">"onItemsUpdate"</span>&gt;</div><div class="line"><span class="tag">&lt;/<span class="name">item-list</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- v-el and v-ref now just use the argument --&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- registers vm.$refs.child for Vue 1.x --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">comp</span> <span class="attr">v-ref:child</span>&gt;</span><span class="tag">&lt;/<span class="name">comp</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- registers vm.$refs.child for Vue 2.0 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">comp</span> <span class="attr">ref:child</span>&gt;</span><span class="tag">&lt;/<span class="name">comp</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- registers vm.$els.node for Vue 1.x, but deprecated in 2.0 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">v-el:node</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;大部分資料是從這裡來的: &lt;a href=&quot;https://github.com/vuejs/vue/wiki/1.0.0-binding-syntax-cheatsheet&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Vue 1.0.0 binding
+    
+    </summary>
+    
+      <category term="vue.js" scheme="https://kuro.tw/categories/vue-js/"/>
+    
+    
+      <category term="vue.js" scheme="https://kuro.tw/tags/vue-js/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>[VueJS] V1 與 V2 元件實體之差異</title>
+    <link href="https://kuro.tw/posts/2016/10/03/VueJS-V1-%E8%88%87-V2-%E5%85%83%E4%BB%B6%E5%AF%A6%E9%AB%94%E4%B9%8B%E5%B7%AE%E7%95%B0/"/>
+    <id>https://kuro.tw/posts/2016/10/03/VueJS-V1-與-V2-元件實體之差異/</id>
+    <published>2016-10-03T10:20:01.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>狂賀！ <a href="https://github.com/vuejs/vue/releases/tag/v2.0.0" title="Vue 2.0" target="_blank" rel="external">Vue 2.0</a> 終於正式發佈！</p>
+<p>關於 Vue 2.0 的新特性，作者也在官方 Blog - <a href="https://medium.com/the-vue-point/vue-2-0-is-here-ef1f26acf4b8#.n0m3yjfmp" title="Vue 2.0 is Here!" target="_blank" rel="external">Vue 2.0 is Here!</a> (<a href="http://jiongks.name/blog/vue-2-is-here/" title="Vue 2.0 来了！" target="_blank" rel="external">中文翻譯</a>) 一文中敘述地相當詳細，這裡就不多說。</p>
+<p>如果你也與我一樣是從 V1 就開始接觸的開發者，一定都知道 VueJS 最核心的一部分是 Component，而 Component 是由實體 (Vue Instance) 來實作。
+在這篇文章，我們就來談談 Vue 1.x 與 2.x 元件實體的差異。</p>
+<hr>
+
+<h3 id="Vue-2-0-元件實體註冊"><a href="#Vue-2-0-元件實體註冊" class="headerlink" title="Vue 2.0 元件實體註冊"></a>Vue 2.0 元件實體註冊</h3><p><img alt="tree of components" src="/static/img/Vue-instance.png"></p>
+<p>像上面這樣的網站，我們可以將它抽象化為一棵「元件樹」，而每個元件樹都會有個根節點，或稱為根實體 (root Vue instance)。</p>
+<p>那麼，每個 Vue 元件樹的根實體其實是透過 <code>Vue</code> 這個建構函式所產生：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</div><div class="line">  <span class="comment">// options</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>將 Vue 元件與實體 DOM 結合的方式有兩種，一種是直接寫在 <code>el</code> option 內：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</div><div class="line">  <span class="attr">el</span>: <span class="string">'#app'</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>而另一種方式則是透過 <code>$mount</code> 來指定節點：
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</div><div class="line">  <span class="comment">// options without 'el'</span></div><div class="line">&#125;);</div><div class="line"></div><div class="line">vm.$mount(<span class="string">'#app'</span>);</div></pre></td></tr></table></figure></p>
+<p>這部分跟 Vue 1.x 的註冊是完全一樣的，但是需要注意的是，在 vue 1.x 允許開發者以 <code>&lt;body&gt;</code> 或 <code>&lt;html&gt;</code> 作為根實體的掛載點，
+但<span style="color: #f00">到了 VueJS 2.0 後，只能透過 <strong>獨立的節點掛載</strong> </span>，如: div 等。 否則會產生錯誤，警告訊息如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">“Do not mount Vue to &lt;html&gt; or &lt;body&gt; - mount to normal elements instead.“</div></pre></td></tr></table></figure>
+<p>換成用獨立的 DOM 節點，如 <code>&lt;div id=&quot;app&quot;&gt;&lt;/div&gt;</code>，就可以正常運作了。</p>
+<hr>
+
+<h3 id="Vue-2-0-元件實體的生命週期"><a href="#Vue-2-0-元件實體的生命週期" class="headerlink" title="Vue 2.0 元件實體的生命週期"></a>Vue 2.0 元件實體的生命週期</h3><p><img alt="Vue 2.0 Lifecycle Diagram" title="Vue 2.0 Lifecycle Diagram" src="/static/img/vue2-lifecycle.png" height="400">
+<span style="font-size: 12px;">圖片來源： <a href="http://vuejs.org/guide/instance.html#Instance-Lifecycle-Hooks" target="_blank" rel="external">Vue 2.0 Guide: Instance Lifecycle Hooks</a></span></p>
+<p>基本上 Vue 2.0 實體生命週期中，大部分的階段都與 Vue 1.x 是一樣的，最大的不同在於 lifecycle hook 名稱的改變，以及在元件被掛載 <code>mounted</code> 之後，還新增了 <code>beforeUpdate</code> 以及 <code>updated</code> 這兩組偵測更新的 hook。</p>
+<p>vue 1.x 的 <code>init</code> 變成 <code>beforeCreate</code> ， <code>beforeCompiled</code> 改為 <code>beforeMount</code>。 而原本的 <code>complied</code> 與 <code>ready</code> 則是統一收斂成 <code>mounted</code>。</p>
+<p>另外需要注意的是，<span style="color: #f00"><strong>若元件本身是透過 server-side rendering 的話，除了 <code>beforeCreate</code> 以及 <code>created</code> 以外的所有 hook 都不會被呼叫</strong></span>  <a href="https://vuejs.org/api/#Options-Lifecycle-Hooks" target="_blank" rel="external">(參考資料)</a>。</p>
+<p>有關元件 V-DOM 的重新渲染與更新後面再提，其他部分則與 Vue 1.x 大同小異。</p>
+<p><hr></p>
+<h3 id="Vue-2-0-元件與模板的編譯-Render-Function"><a href="#Vue-2-0-元件與模板的編譯-Render-Function" class="headerlink" title="Vue 2.0 元件與模板的編譯 - Render Function"></a>Vue 2.0 元件與模板的編譯 - Render Function</h3><p>在大部分情況下，透過元件的 <code>template</code> 屬性，或是直接寫在 HTML 中就已經足夠操作你的元件了。
+不過若是你想完全透過 JavaScript 來操作你的元件，那麼可以使用 render 這個 function 直接來寫底層的 virtual-DOM 來取代 <code>template</code> 屬性。
+VueJS 2.0 的 virtual DOM 機制，是採用 <a href="https://github.com/snabbdom/snabbdom" title="snabbdom" target="_blank" rel="external">snabbdom</a> 這個 virtual DOM 的 library 來實作的。</p>
+<p>可以使用 <code>createElement</code> 這個 function 來建立你的元件內容：
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// @returns &#123;VNode&#125;</span></div><div class="line">createElement(</div><div class="line">  <span class="comment">// &#123;String | Object | Function&#125;</span></div><div class="line">  <span class="comment">// An HTML tag name, component options, or function</span></div><div class="line">  <span class="comment">// returning one of these. Required.</span></div><div class="line">  <span class="string">'div'</span>,</div><div class="line">  <span class="comment">// &#123;Object&#125;</span></div><div class="line">  <span class="comment">// A data object corresponding to the attributes</span></div><div class="line">  <span class="comment">// you would use in a template. Optional.</span></div><div class="line">  &#123;</div><div class="line">    <span class="comment">// (see details in the next section below)</span></div><div class="line">  &#125;,</div><div class="line">  <span class="comment">// &#123;String | Array&#125;</span></div><div class="line">  <span class="comment">// Children VNodes. Optional.</span></div><div class="line">  [</div><div class="line">    createElement(<span class="string">'h1'</span>, <span class="string">'hello world'</span>)</div><div class="line">    createElement(MyComponent, &#123;</div><div class="line">      <span class="attr">props</span>: &#123;</div><div class="line">        <span class="attr">someProp</span>: <span class="string">'foo'</span></div><div class="line">      &#125;</div><div class="line">    &#125;),</div><div class="line">    <span class="string">'bar'</span></div><div class="line">  ]</div><div class="line">)</div></pre></td></tr></table></figure></p>
+<p>官方也提供了一個完整的 render function 範例：
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> getChildrenTextContent = <span class="function"><span class="keyword">function</span> (<span class="params">children</span>) </span>&#123;</div><div class="line">  <span class="keyword">return</span> children.map(<span class="function"><span class="keyword">function</span> (<span class="params">node</span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> node.children</div><div class="line">      ? getChildrenTextContent(node.children)</div><div class="line">      : node.text</div><div class="line">  &#125;).join(<span class="string">''</span>)</div><div class="line">&#125;</div><div class="line">Vue.component(<span class="string">'anchored-heading'</span>, &#123;</div><div class="line">  <span class="attr">render</span>: <span class="function"><span class="keyword">function</span> (<span class="params">createElement</span>) </span>&#123;</div><div class="line">    <span class="comment">// create kebabCase id</span></div><div class="line">    <span class="keyword">var</span> headingId = getChildrenTextContent(<span class="keyword">this</span>.$slots.default)</div><div class="line">      .toLowerCase()</div><div class="line">      .replace(<span class="regexp">/\W+/g</span>, <span class="string">'-'</span>)</div><div class="line">      .replace(<span class="regexp">/(^\-|\-$)/g</span>, <span class="string">''</span>)</div><div class="line"></div><div class="line">    <span class="keyword">return</span> createElement(</div><div class="line">      <span class="string">'h'</span> + <span class="keyword">this</span>.level,</div><div class="line">      [</div><div class="line">        createElement(<span class="string">'a'</span>, &#123;</div><div class="line">          <span class="attr">attrs</span>: &#123;</div><div class="line">            <span class="attr">name</span>: headingId,</div><div class="line">            <span class="attr">href</span>: <span class="string">'#'</span> + headingId</div><div class="line">          &#125;</div><div class="line">        &#125;, <span class="keyword">this</span>.$slots.default)</div><div class="line">      ]</div><div class="line">    )</div><div class="line">  &#125;,</div><div class="line">  <span class="attr">props</span>: &#123;</div><div class="line">    <span class="attr">level</span>: &#123;</div><div class="line">      <span class="attr">type</span>: <span class="built_in">Number</span>,</div><div class="line">      <span class="attr">required</span>: <span class="literal">true</span></div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure></p>
+<p>當然，你可能跟我一樣覺得一層又一層的 <code>createElement</code> 看了總是讓人厭煩，你也可以透過這個 Plugin: <a href="https://github.com/vuejs/babel-plugin-transform-vue-jsx" target="_blank" rel="external">babel-plugin-transform-vue-jsx</a>，來做 JSX 語法的轉換，如果你曾是 react 應用程式的開發者，應該對 JSX 語法不陌生。 寫起來會像這樣：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> AnchoredHeading <span class="keyword">from</span> <span class="string">'./AnchoredHeading.vue'</span></div><div class="line"></div><div class="line"><span class="keyword">new</span> Vue(&#123;</div><div class="line">  <span class="attr">el</span>: <span class="string">'#demo'</span>,</div><div class="line">  render (h) &#123;</div><div class="line">    <span class="keyword">return</span> (</div><div class="line">      &lt;AnchoredHeading level=&#123;1&#125;&gt;</div><div class="line">        &lt;span&gt;Hello&lt;/span&gt; world!</div><div class="line">      &lt;/AnchoredHeading&gt;</div><div class="line">    )</div><div class="line">  &#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>在預設情況中，VueJS 2.0 會將 <code>template</code> 內的 HTML 透過 parse 轉換成 AST，再自動轉換優化成 render function 去建立 virtual DOM。 在建立 virtual DOM 之後，透過 observe 機制與資料進行綁定，再 compile 成實體的 DOM 並渲染至網頁上：</p>
+<p><img src="/static/img/vue2-rendering-flow.png">
+<span style="font-size: 12px;">參考資料與圖片來源： <a href="https://speakerdeck.com/kazupon/next-vue-dot-js-2-dot-0" target="_blank" rel="external">Next Vue.js 2.0 by kazupon</a></span></p>
+<p>前面說過，VueJS 2.0 會將 <code>template</code> 內的 HTML 自動編譯成 render function，下面這是官方文件以 <code>Vue.compile</code> 提供的 demo：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- template --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">h1</span>&gt;</span>I'm a template!<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">p</span> <span class="attr">v-if</span>=<span class="string">"message"</span>&gt;</span></div><div class="line">    &#123;&#123; message &#125;&#125;</div><div class="line">  <span class="tag">&lt;/<span class="name">p</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">p</span> <span class="attr">v-else</span>&gt;</span></div><div class="line">    No message.</div><div class="line">  <span class="tag">&lt;/<span class="name">p</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// render:</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">anonymous</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="keyword">with</span>(<span class="keyword">this</span>)&#123;<span class="keyword">return</span> _h(<span class="string">'div'</span>,[_m(<span class="number">0</span>),(message)?_h(<span class="string">'p'</span>,[_s(message)]):_h(<span class="string">'p'</span>,[<span class="string">"No message."</span>])])&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// staticRenderFns:</span></div><div class="line">_m(<span class="number">0</span>): <span class="function"><span class="keyword">function</span> <span class="title">anonymous</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="keyword">with</span>(<span class="keyword">this</span>)&#123;<span class="keyword">return</span> _h(<span class="string">'h1'</span>,[<span class="string">"I'm a template!"</span>])&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><hr></p>
+<h3 id="Vue-2-0-元件的追蹤變化"><a href="#Vue-2-0-元件的追蹤變化" class="headerlink" title="Vue 2.0 元件的追蹤變化"></a>Vue 2.0 元件的追蹤變化</h3><p>最後，我們來看看元件內狀態的追蹤變化。有寫過 VueJS 1.x 的朋友應該知道，元件實體內有個 option 叫 <code>data</code>，
+這個 <code>data</code> 物件就是用來存放元件內狀態/資料的地方。</p>
+<p>與 Vue 1.x 相同的地方是，<code>data</code> 物件透過 <code>Object.defineProperty()</code> 來為元件內各屬性設定 「getter」與「setter」。
+就在 data 屬性被存取修改時，會透過 getter/setter 來通知物件內屬性的變化，當先前設定好的 setter 被呼叫的時候，會去觸發 watcher 重新計算，也就會導致 DOM 的更新與重新渲染。</p>
+<p>與 Vue 1.x 不同的是，Vue 1.x 是透過 directive 來重新渲染 DOM 內容：</p>
+<p><img src="/static/img/vue1-watcher.png"></p>
+<p>而 Vue 2.0 在通知 watcher 更新時，會去呼叫前面介紹的 「render function」與更新後的 data 去做更新後再次渲染，概念與 1.x 大致相同。
+但更新 DOM 的手法不同，減少了不必要的比對，也因此大幅度提升了效能。</p>
+<p><img src="/static/img/vue2-watcher.png"></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;狂賀！ &lt;a href=&quot;https://github.com/vuejs/vue/releases/tag/v2.0.0&quot; title=&quot;Vue 2.0&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Vue 2.0&lt;/a&gt; 終於正式發佈！&lt;/p&gt;
+&lt;p&gt;
+    
+    </summary>
+    
+      <category term="vue.js" scheme="https://kuro.tw/categories/vue-js/"/>
+    
+    
+      <category term="vue.js" scheme="https://kuro.tw/tags/vue-js/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>VueJS 2.0 升級小幫手: Vue migration helper</title>
+    <link href="https://kuro.tw/posts/2016/09/30/Vue-2-0-%E5%8D%87%E7%B4%9A%E5%B0%8F%E5%B9%AB%E6%89%8B-Vue-migration-helper/"/>
+    <id>https://kuro.tw/posts/2016/09/30/Vue-2-0-升級小幫手-Vue-migration-helper/</id>
+    <published>2016-09-30T14:38:01.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>Vue JS 自今年四月 (2016/04) 發佈 Vue 2.0 preview 版本至今也有五個月了，在新舊版本的交替之中，開發者最關心的一定是「<strong>我的專案能不能升到 Vue 2.0</strong>」、「<strong>升上去會不會爆</strong>」、「<strong>專案該用那個版本來開發</strong>」，<del>「聽說隔壁那個 ng 升級幾乎等於砍掉重練」</del> 之類的問題。</p>
+<p>不過幸好，Vue 1.0 與 Vue 2.0 有 90% 的 API 是相同的，過去在 Vue 1.x 的核心概念到 Vue 2.0 一樣可以沿用，而且又多了些新特性。</p>
+<p>這裡有一份官方的<a href="http://rc.vuejs.org/guide/migration.html" title="Migration from Vue 1.x" target="_blank" rel="external">升級建議</a>，有點長，如果沒有耐心讀的話，沒關係，這裡介紹你好物: <br> <strong><span style="color: #f00;">Vue migration helper</span></strong>。</p>
+<p>傳說中的升級小幫手 Vue migration helper: <a href="https://github.com/vuejs/vue-migration-helper" target="_blank" rel="external">https://github.com/vuejs/vue-migration-helper</a></p>
+<p>使用方式很簡單，打開 terminal 透過 npm 安裝後，在你的專案目錄下執行 vue-migration-helper，小幫手就會幫你掃描整份專案，然後給你修改的建議了。</p>
+<p>完整的安裝與使用方式：
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"># install</div><div class="line">$ npm install --global git://github.com/vuejs/vue-migration-helper.git</div><div class="line"></div><div class="line"># navigate to a Vue 1.x project directory</div><div class="line">$ cd path/to/my-vue-project</div><div class="line"></div><div class="line"># scan all files in the current directory</div><div class="line">$ vue-migration-helper</div></pre></td></tr></table></figure></p>
+<p>拿之前的某份範例試試，就像這樣：</p>
+<p><del>花惹發</del>，滿坑滿谷的升級建議
+<img src="/static/img/vue-migration-demo.png" alt="migration"></p>
+<p>依照 migration helper 給的建議一一修正後，再次執行專案，檢查一下 console，是否有噴錯，如果沒有錯誤，那麼專案的升級也就差不多了。</p>
+<p>不過要注意，目前 Vue migration helper 還在 beta 階段，如果未來要再更新至新版的話，直接再次執行 <code>npm install --global git://github.com/vuejs/vue-migration-helper.git</code> 重新安裝一次就好。</p>
+<p>最後，鄉親啊，如果你正要開啟新專案，建議現在就可以直接從 Vue 2.0 進入喔！</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Vue JS 自今年四月 (2016/04) 發佈 Vue 2.0 preview 版本至今也有五個月了，在新舊版本的交替之中，開發者最關心的一定是「&lt;strong&gt;我的專案能不能升到 Vue 2.0&lt;/strong&gt;」、「&lt;strong&gt;升上去會不會爆&lt;/strong&gt;」
+    
+    </summary>
+    
+      <category term="vue.js" scheme="https://kuro.tw/categories/vue-js/"/>
+    
+    
+      <category term="vue.js" scheme="https://kuro.tw/tags/vue-js/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>[VueJS] 在 v-for 列表中透過 filter 完成搜尋與分頁的功能</title>
+    <link href="https://kuro.tw/posts/2016/05/30/vuejs-in-v-for-through-the-filter-in-the-list-complete-search-and-page-functions/"/>
+    <id>https://kuro.tw/posts/2016/05/30/vuejs-in-v-for-through-the-filter-in-the-list-complete-search-and-page-functions/</id>
+    <published>2016-05-30T06:30:00.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>最近 <a href="https://vuejs.org/" target="_blank" rel="external">Vue.js</a> 正夯，所以手上幾個東西打算用這個來改寫，關於 Vue.js 的基本介紹可以參考小弟的投影片，這裡就不再贅述。</p>
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/DLQDvLrRSNunsY" width="476" height="400" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:10px; max-width: 100%;" allowfullscreen> </iframe>
+
+<p>有用過 Vue.js 開發的朋友一定知道它提供的 filter 功能十分強大，在 <code>v-for</code> 列表中使用 <code>filterBy</code> 可以在一行內完成列表搜尋的功能：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"filter-by-example"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">v-model</span>=<span class="string">"n"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">ul</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- 透過 input 欄位的 v-model n 與 user.name 做模糊比對 --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-for</span>=<span class="string">"user in users | filterBy n in 'name'"</span>&gt;</span></div><div class="line">      &#123;&#123; user.name &#125;&#125;</div><div class="line">    <span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>若是要限制顯示的筆數也能用 <code>limitBy</code> 做到，進而完成分頁的功能。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- 只顯示前 10 個元素 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">v-for</span>=<span class="string">"item in items | limitBy 10"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- 顯示第 5 到 15 筆元素--&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">v-for</span>=<span class="string">"item in items | limitBy 10 5"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>這次遇到的問題是這樣的，如果我們想要同時完成「搜尋」與「分頁」的需求，光靠 <code>filterBy</code> 與 <code>limitBy</code> 就不是那麼容易做到，還好 Vue.js 提供了<a href="http://vuejs.org/guide/custom-filter.html" target="_blank" rel="external">自訂 filter</a> 的功能：先用 filterBy 過濾，再透過自訂 recordLength 記錄過濾後的資料數量，最後再用 limitBy 搭配頁籤切換頁面。
+小心 filter 的順序，filter 會依序執行，然後再繼續下個 filter。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">tr</span> <span class="attr">v-for</span>=<span class="string">" r in rows</span></span></div><div class="line">             | filterBy filter_name in 'name'</div><div class="line">             | recordLength 'filteredRowCount'</div><div class="line">             | limitBy countOfPage pageStart "&gt;</div><div class="line">    <span class="tag">&lt;<span class="name">td</span>&gt;</span>......<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">tr</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>然後是自定的 filter <code>recordLength</code>：
+result 代表傳入的資料， key 則是從 view 帶入的參數，這個範例是 <code>filteredRowCount</code>。</p>
+<p>這裡透過 <code>vm.$set</code> 來將過濾後的數量指定至 vue 實體，以便可以直接在 Vue 實體使用。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Vue.filter(<span class="string">'recordLength'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">result, key</span>) </span>&#123;</div><div class="line">  <span class="keyword">this</span>.$set(key, result.length);</div><div class="line">  <span class="keyword">return</span> result;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>最後在頁籤的部分，我們就可以簡單透過 <code>filter_name</code> 欄位是否空白來切換是否透過 <code>filteredRowCount</code> 計算總頁數:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">totalPage: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">  <span class="keyword">if</span>( <span class="keyword">this</span>.filter_name.trim() === <span class="string">''</span> ) &#123;</div><div class="line">    <span class="keyword">return</span> <span class="built_in">Math</span>.ceil(<span class="keyword">this</span>.rows.length / <span class="keyword">this</span>.countOfPage);</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">else</span>&#123;</div><div class="line">    <span class="keyword">return</span> <span class="built_in">Math</span>.ceil(<span class="keyword">this</span>.filteredRowCount / <span class="keyword">this</span>.countOfPage);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>完整的 <a href="http://jsbin.com/bimawidora/1/edit?html,js,output" target="_blank" rel="external">demo</a> 如下:</p>
+<p><a class="jsbin-embed" href="http://jsbin.com/bimawidora/embed?output" target="_blank" rel="external">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?3.35.12"></script></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;最近 &lt;a href=&quot;https://vuejs.org/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Vue.js&lt;/a&gt; 正夯，所以手上幾個東西打算用這個來改寫，關於 Vue.js 的基本介紹可以參考小弟的投影片，這裡就不再贅述。&lt;/p&gt;
+&lt;ifr
+    
+    </summary>
+    
+      <category term="vue.js" scheme="https://kuro.tw/categories/vue-js/"/>
+    
+    
+      <category term="vue.js" scheme="https://kuro.tw/tags/vue-js/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>利用 d3.js 製作 responsive 的長條圖</title>
+    <link href="https://kuro.tw/posts/2015/12/20/use-d3js-to-create-responsive-histogram/"/>
+    <id>https://kuro.tw/posts/2015/12/20/use-d3js-to-create-responsive-histogram/</id>
+    <published>2015-12-19T22:02:00.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>利用 d3.js 我們可以很輕易地產生我們想要的圖表，以最常見的長條圖為例，只要透過 scale (比例尺) 與 axis (軸線)，再加上一點 SVG 的基礎知識，像這樣的長條圖一下子就可以生成。</p>
+<p><img src="http://user-image.logdown.io/user/3292/blog/3340/post/378297/2V8wHgLUTEawU5iJstYS_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-12-20%20%E4%B8%8B%E5%8D%8812.21.25.png" alt="螢幕快照 2015-12-20 下午12.21.25.png">
+[<a href="http://kurotanshi.github.io/d3js-samples/rwd/rwd.html" title="長條圖範例" target="_blank" rel="external">Code</a>]</p>
+<p>但是，像這樣尺寸的圖表，往往都會因為太大而不適合在手機螢幕上呈現。還好 SVG 有著向量圖形的特性，可以自由縮放，這篇就來簡單介紹 d3.js 的長條圖如何也能做出 rwd 的效果。</p>
+<p>在上面的程式碼內，我們可以看到，原先設定的寬高是寫死的 960 與 500 (未扣除邊界)
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> margin = <span class="number">40</span>,</div><div class="line">    width = <span class="number">960</span> - margin*<span class="number">2</span>,</div><div class="line">    height = <span class="number">500</span> - margin*<span class="number">2</span>;</div></pre></td></tr></table></figure></p>
+<p>所以第一步，我們先將外層的 <code>.content</code> 元素設定成寬高 100%，然後把原先寫死的寬高改成由程式去抓取實際的寬高
+<figure class="highlight css"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="selector-class">.content</span>&#123;</div><div class="line">  <span class="attribute">display</span>: block;</div><div class="line">  <span class="attribute">width</span>: <span class="number">100%</span>;</div><div class="line">  <span class="attribute">height</span>: <span class="number">100%</span>;</div><div class="line">  <span class="attribute">min-width</span>: <span class="number">300px</span>;</div><div class="line">  <span class="attribute">max-width</span>: <span class="number">960px</span>;</div><div class="line">  <span class="attribute">max-height</span>: <span class="number">500px</span>;</div><div class="line">  <span class="attribute">overflow</span>: hidden;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 將尺寸改成即時取得的寬高</span></div><div class="line">width = <span class="built_in">parseInt</span>(d3.select(<span class="string">".content"</span>).style(<span class="string">"width"</span>), <span class="number">10</span>) - margin*<span class="number">2</span>;</div><div class="line">height = <span class="built_in">parseInt</span>(d3.select(<span class="string">".content"</span>).style(<span class="string">"height"</span>), <span class="number">10</span>) - margin*<span class="number">2</span>;</div></pre></td></tr></table></figure>
+<p>然後我們將瀏覽器縮小之後重整，結果像這樣：
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/378297/Jrbqo6EaTJswhfBQUF6g_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-12-20%20%E4%B8%8B%E5%8D%881.23.36.png" alt="螢幕快照 2015-12-20 下午1.23.36.png">
+[<a href="http://kurotanshi.github.io/d3js-samples/rwd/rwd2.html" title="長條圖範例2" target="_blank" rel="external">Code</a>]</p>
+<p>可以看到，這個時候因為畫面的寬高已經不是寫死的了，所以會依「繪製圖形當下」的寬高去做比例的修正。這時我們已經完成了長條圖 RWD 的第一步了。</p>
+<p>這時要是將行動裝置螢幕橫擺後，比例並不會依照橫擺之後有所不同，如果要使用者不斷地重整頁面，這就太不友善了。所以，我們要在瀏覽器上加上 <code>resize</code> 事件，並將繪製圖形的動作通通封裝至 rendering 這個 function 內。</p>
+<p>這個時候的程式架構會像這樣：
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> svg = d3.select(<span class="string">'.svg'</span>);</div><div class="line"></div><div class="line"><span class="comment">// 將繪製動作包裝至 function 內</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">rendering</span>(<span class="params"></span>) </span>&#123;</div><div class="line">   <span class="comment">// 將繪製的程式碼通通搬到裡面</span></div><div class="line">   <span class="comment">// 內略</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 將 window 綁定 resize 事件，並重新繪製圖型</span></div><div class="line">d3.select(<span class="built_in">window</span>).on(<span class="string">'resize'</span>, rendering);</div><div class="line"></div><div class="line"><span class="comment">// 首次繪製</span></div><div class="line">rendering();</div></pre></td></tr></table></figure></p>
+<p>所以，這個時候，我們可以任意拉放瀏覽器的尺寸
+像這樣
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/378297/eTI8r7EXSQWaH80HZuKH_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-12-20%20%E4%B8%8B%E5%8D%881.39.54.png" alt="螢幕快照 2015-12-20 下午1.39.54.png"></p>
+<p>或是這樣
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/378297/NMpkG3LeTOWaYaNf9pYC_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-12-20%20%E4%B8%8B%E5%8D%881.40.01.png" alt="螢幕快照 2015-12-20 下午1.40.01.png"></p>
+<p>[<a href="http://kurotanshi.github.io/d3js-samples/rwd/rwd3.html" title="長條圖範例3" target="_blank" rel="external">Code</a>]
+都是沒有問題的。</p>
+<p>這份長條圖到目前為止已經可以說是好棒棒了。
+可是不曉得有沒有人發現，在最後那張橫擺的 y 軸刻度實在太過擁擠，其實是不容易閱讀的:
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/378297/VA6ir3TRyutauy6ALqdH_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-12-20%20%E4%B8%8B%E5%8D%881.42.43.png" alt="螢幕快照 2015-12-20 下午1.42.43.png"></p>
+<p>我們可以怎麼樣更優化呢？</p>
+<p>這時候就要利用 d3.js 提供的 <code>tick()</code> 功能，來為我們調整 y 軸上的刻度。
+只要在 y 軸上加上 tick ，像這樣:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// y 軸加上 ticks</span></div><div class="line"><span class="keyword">var</span> yAxis = d3.svg.axis()</div><div class="line">      .scale(yScale2)</div><div class="line">      .orient(<span class="string">"left"</span>)</div><div class="line">      .ticks(<span class="built_in">Math</span>.max(height/<span class="number">50</span>, <span class="number">2</span>));</div></pre></td></tr></table></figure>
+<p><code>Math.max</code> 會回傳兩個指定數字中較大的一個，而 <code>ticks()</code> 則是設定軸線上刻度的數量。</p>
+<p>所以經過剛剛的設定，當圖形的高度大於 100px 的時候，圖表每 50px 會有一個刻度，而圖形高度小於或等於 100px 時，則至少會有兩個刻度，像這樣：</p>
+<p><img src="http://user-image.logdown.io/user/3292/blog/3340/post/378297/Mz3vq9BKRZ2dkSd5SP6W_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-12-20%20%E4%B8%8B%E5%8D%881.54.29.png" alt="螢幕快照 2015-12-20 下午1.54.29.png"></p>
+<p><img src="http://user-image.logdown.io/user/3292/blog/3340/post/378297/swZcbhnQPmhiWQBwTbDG_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-12-20%20%E4%B8%8B%E5%8D%881.55.08.png" alt="螢幕快照 2015-12-20 下午1.55.08.png"></p>
+<p>[<a href="http://kurotanshi.github.io/d3js-samples/rwd/rwd4.html" title="長條圖範例4" target="_blank" rel="external">Code</a>]</p>
+<p>實際用手機試試：</p>
+<p><img src="http://user-image.logdown.io/user/3292/blog/3340/post/378297/mM3agzeTGGGdM2p4YjZq_2015-12-20%2003.33.30.png" alt="2015-12-20 03.33.30.png">
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/378297/j4wccnAOTZWhLzubTUDw_2015-12-20%2003.33.43.png" alt="2015-12-20 03.33.43.png"></p>
+<p>透過這樣的修正，就可以讓圖表變得更好閱讀了。</p>
+<p>以上，我們只要做簡單的小調整，就可以讓現有的 d3 長條圖做到有 RWD 的效果。</p>
+<p>但是要注意的是，不是所有圖表都合適在手機螢幕上呈現，在設計時也需要把這些考慮進去，是要為手機版本另外做一個新的圖表，或是做 RWD 的設計，就看使用的情境以及想表達的意義來決定囉。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;利用 d3.js 我們可以很輕易地產生我們想要的圖表，以最常見的長條圖為例，只要透過 scale (比例尺) 與 axis (軸線)，再加上一點 SVG 的基礎知識，像這樣的長條圖一下子就可以生成。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://user-image.lo
+    
+    </summary>
+    
+      <category term="D3.js" scheme="https://kuro.tw/categories/D3-js/"/>
+    
+    
+      <category term="d3.js" scheme="https://kuro.tw/tags/d3-js/"/>
+    
+      <category term="rwd" scheme="https://kuro.tw/tags/rwd/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>利用 Google Fusion Table，不用寫 code 也可以產生主題地圖</title>
+    <link href="https://kuro.tw/posts/2015/10/15/using-google-fusion-table-without-writing-code-or-topic-maps/"/>
+    <id>https://kuro.tw/posts/2015/10/15/using-google-fusion-table-without-writing-code-or-topic-maps/</id>
+    <published>2015-10-14T18:16:00.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>感謝台北市政府以及<a href="https://www.facebook.com/photo.php?fbid=10204828212414899&amp;set=a.1357755313713.2044236.1526408898&amp;type=3" target="_blank" rel="external">相關人士的努力</a>，在十月中旬的時候，台北市 open data 平台又開放了「<a href="http://data.taipei/opendata/datalist/datasetMeta?oid=68785231-d6c5-47a1-b001-77eec70bec02" target="_blank" rel="external">台北市住宅竊盜點位資訊</a>」這樣的資料，雖然很多人戲稱房價又要下跌了，但是老話一句，身為<del>有良心的開發者，當然居住安全比房價什麼的還要重要得多</del>。</p>
+<p>那麼，拿到這份資料我們可以怎麼玩呢?
+剛好這份資料的格式是 CSV (Comma-Separated Values，一種由逗點分隔的純文字資料格式)，所以本篇就來介紹如何透過 <a href="https://support.google.com/fusiontables/answer/2571232" target="_blank" rel="external">Google Fusion Table</a> 來讓我們不必寫任何的 code ，也可以建立主題地圖。</p>
+<p>首先先到<a href="http://data.taipei/opendata/datalist/datasetMeta?oid=68785231-d6c5-47a1-b001-77eec70bec02" target="_blank" rel="external">台北市住宅竊盜點位資訊</a>，點一下「使用資料」將所需的檔案下載下來，會得到一份 csv 檔案。</p>
+<p><img src="http://user-image.logdown.io/user/3292/blog/3340/post/304787/UsvTpRmSDWhtT8junGNw_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-10-15%20%E4%B8%8A%E5%8D%8810.16.22.png" alt="螢幕快照 2015-10-15 上午10.16.22.png"></p>
+<p>接著打開 <a href="https://support.google.com/fusiontables/answer/2571232" target="_blank" rel="external">Google Fusion Table</a> 的頁面，看到下面這個畫面：
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/304787/vFIqF2IuSOuhKhR0mKUt_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-10-15%20%E4%B8%8A%E5%8D%8810.33.31.png" alt="螢幕快照 2015-10-15 上午10.33.31.png"></p>
+<p>接著選擇「CREATE A FUSION TABLE」，會看到這樣的畫面：
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/304787/QrsLmP03QNamaW0qrqjT_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-10-15%20%E4%B8%8A%E5%8D%8810.37.48.png" alt="螢幕快照 2015-10-15 上午10.37.48.png"></p>
+<p>現在試著把剛剛的 csv 直接餵給他，看看會發生什麼事
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/304787/Wf4cjXTQTrCXlw0UDWMl_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-10-15%20%E4%B8%8A%E5%8D%8810.05.47.png" alt="螢幕快照 2015-10-15 上午10.05.47.png"></p>
+<p>如果不意外，你應該會得到像這樣的亂碼資料 XDDDDD
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/304787/AUqRTPyFQX29z5TdLGaM_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-10-15%20%E4%B8%8A%E5%8D%8810.06.19.png" alt="螢幕快照 2015-10-15 上午10.06.19.png"></p>
+<p>不過沒關係，山不轉路轉，檔案格式當然也可以轉。只是需要多走幾步路。
+這次我們將原始的 csv 資料先丟到 <a href="http://www.google.com/intl/zh-TW_tw/sheets/about/" target="_blank" rel="external">Google Sheet</a> 內，請他將我們的資料轉成正確的編碼。 在建立一個新的 Google Sheet 之後，我們選擇 File &gt; Import 將剛剛的 csv 檔案匯入：
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/304787/fNpq4j4rTEuynwQAcxOO_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-10-15%20%E4%B8%8A%E5%8D%8810.07.40.png" alt="螢幕快照 2015-10-15 上午10.07.40.png"></p>
+<p>記得一樣要選擇 Comma，因為是透過逗點分隔的資料格式。
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/304787/bbUWtz7RXqdpZsizK5Lw_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-10-15%20%E4%B8%8A%E5%8D%8810.08.07.png" alt="螢幕快照 2015-10-15 上午10.08.07.png"></p>
+<p>然後就會得到正確編碼後的資料囉。<del>不過糖廍里一樣 GG...因為原始資料就 GG 了... orz</del>
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/304787/wYMPpnlHTRmrgoywrKGc_%E6%9C%AA%E5%91%BD%E5%90%8D.png" alt="未命名.png"></p>
+<p>ok, 到了這裡我們已經有一份正確的資料，這時再回到 Funsion Table，我們選擇 「Google Spreadsheets」，然後將剛剛建立的 Google Sheet 匯入進來:
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/304787/QrsLmP03QNamaW0qrqjT_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-10-15%20%E4%B8%8A%E5%8D%8810.37.48.png" alt="螢幕快照 2015-10-15 上午10.37.48.png"></p>
+<p><img src="http://user-image.logdown.io/user/3292/blog/3340/post/304787/66zfnteRQy6L50MJQUZ1_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-10-15%20%E4%B8%8A%E5%8D%8810.11.18.png" alt="螢幕快照 2015-10-15 上午10.11.18.png"></p>
+<p>匯入成功後，Funsion Table 會出現這樣的畫面：
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/304787/pDQ7qI4WSDub29jPiglU_%E6%9C%AA%E5%91%BD%E5%90%8D.png" alt="未命名.png"></p>
+<p>這個時候，因為我們要製作地圖，所以要告訴 Funsion Table 地點的欄位不是單純的字串，而是用來表示地理資訊的資料。點選 Edit &gt; Change columns：
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/304787/thibCn9zRMO435hQgjFd_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-10-15%20%E4%B8%8A%E5%8D%8810.11.57.png" alt="螢幕快照 2015-10-15 上午10.11.57.png"></p>
+<p>然後將發生地點的 Type 改成 Location，然後點上面藍色的 Save 儲存。
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/304787/TK4RPNQtQNiXcQBclDeu_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-10-15%20%E4%B8%8A%E5%8D%8810.12.09.png" alt="螢幕快照 2015-10-15 上午10.12.09.png"></p>
+<p>資料都準備好了，然後我們建立地圖：
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/304787/csg65yBiQIyKcj1PAnNk_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-10-15%20%E4%B8%8A%E5%8D%8810.58.53.png" alt="螢幕快照 2015-10-15 上午10.58.53.png"></p>
+<p>不意外的話你應該會看到這樣的畫面，是因為我們傳入的是地址的文字資訊， Google 需要將它轉為經緯度後才能對應到地圖上：
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/304787/JJNbZ5DRRmehqBdoDytm_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-10-15%20%E4%B8%8A%E5%8D%8810.13.03.png" alt="螢幕快照 2015-10-15 上午10.13.03.png"></p>
+<p>然後等待一段時間後，Funsion Table 就會為我們產生地圖，像這樣：
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/304787/7cjQA7USzGy7nGrQRLDr_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-10-15%20%E4%B8%8A%E5%8D%8810.20.02.png" alt="螢幕快照 2015-10-15 上午10.20.02.png"></p>
+<p>除了地點標示外，他也提供了熱圖 (Heat Map) 的呈現，試著拉拉旁邊的捲軸調整參數吧：
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/304787/wMQb7zI8R72jFxu7a3g4_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-10-15%20%E4%B8%8A%E5%8D%8811.03.53.png" alt="螢幕快照 2015-10-15 上午11.03.53.png"></p>
+<p>當然你也可以做好的地圖 share 出來，像這樣：</p>
+<iframe width="800" height="400" scrolling="no" frameborder="no" src="https://www.google.com/fusiontables/embedviz?q=select+col3+from+1sAGtul5gWv1_yRpPTYI1ZvPaHQRPDod-B0MbOeS_&amp;viz=MAP&amp;h=false&amp;lat=25.05814459656792&amp;lng=121.63429174086912&amp;t=1&amp;z=12&amp;l=col3&amp;y=3&amp;tmplt=4&amp;hml=GEOCODABLE"></iframe>
+
+<p>透過 Fusion Table 我們可以不用寫任何的程式碼就生成一份資訊地圖，很簡單吧 :)</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;感謝台北市政府以及&lt;a href=&quot;https://www.facebook.com/photo.php?fbid=10204828212414899&amp;amp;set=a.1357755313713.2044236.1526408898&amp;amp;type=3&quot; target
+    
+    </summary>
+    
+      <category term="Google Map" scheme="https://kuro.tw/categories/Google-Map/"/>
+    
+    
+      <category term="google map" scheme="https://kuro.tw/tags/google-map/"/>
+    
+      <category term="Fusion Table" scheme="https://kuro.tw/tags/Fusion-Table/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>利用 Google Map 檢視台北市降雨淹水模擬圖</title>
+    <link href="https://kuro.tw/posts/2015/09/30/use-google-map-view-rainfall-simulation-of-flooding-in-taipei-city-map/"/>
+    <id>https://kuro.tw/posts/2015/09/30/use-google-map-view-rainfall-simulation-of-flooding-in-taipei-city-map/</id>
+    <published>2015-09-29T20:00:00.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>看到前兩天的新聞: <a href="https://tw.news.yahoo.com/%E6%9F%AF%E6%96%87%E5%93%B2%E6%83%B3%E5%85%AC%E9%96%8B%E6%98%93%E6%B7%B9%E6%B0%B4%E5%9C%B0%E5%8D%80-%E5%8C%97%E5%B8%82%E5%BA%9C%E5%B7%B2%E4%B8%8A%E7%B6%B2-115016390.html" title="柯文哲想公開易淹水地區 北市府已上網" target="_blank" rel="external">柯文哲想公開易淹水地區 北市府已上網</a>，又剛好有前輩寫了一篇 <a href="http://gis.rchss.sinica.edu.tw/qgis/?p=3221" title="利用QGIS檢視台北市降雨淹水模擬圖" target="_blank" rel="external">利用QGIS檢視台北市降雨淹水模擬圖</a>，<del>雖然身處房仲業，但身為有良心的開發者不能只想著房價</del>，心想應也可透過 Google Map 來呈現，於是試了一下，順便寫篇記錄。</p>
+<p>首先從<a href="http://data.taipei/opendata/datalist/datasetMeta?oid=fa1e8012-ebb4-473b-888e-97f9a9ce365e" title="臺北市政府資料開放平台" target="_blank" rel="external">臺北市政府資料開放平台</a>將所需的資料一一下載下來，格式是 kmz (其實就是 zip 壓縮)。在解壓縮後可以得到 doc.kml 檔案。 接著，雖然 Google maps API 有提供 <a href="https://developers.google.com/maps/documentation/javascript/examples/layer-kml" title="Google maps API KML Layers" target="_blank" rel="external">KML Layers</a> 的圖層嵌套，但轉出來的 kml 檔似乎要稍作修改後才能透過 KML Layers 套用在 Google map 上，這裏我選擇另一種做法: 將 kml 轉為 geoJSON 後使用。</p>
+<p>前面說到要將 kml 檔案轉為 geoJSON，那麼該如何轉換格式呢？
+幸好 mapbox 提供了 <a href="https://github.com/mapbox/togeojson" target="_blank" rel="external">togeojson</a> 這套工具，透過它提供的 <code>toGeoJSON.kml(doc)</code> 就可以輕鬆地將它轉為 geoJSON 的格式了。</p>
+<p>有關 GeoJSON 如何輸出至 Google Map 可以參考小弟之前的 post：<a href="http://kuro.tw/posts/2015/04/28/through-the-google-maps-api-geojson-data">透過 Google Maps API 處理 GeoJSON 資料</a>，這裏就不再贅述。</p>
+<p>值得一提的是，透過 Google Maps Javascript API 輸出的 GeoJSON 預設的樣式都是黑色粗線，想要修改樣式的話可以透過 <code>setStyle</code> 來做處理，像這樣可以針對 name 是 0.3 的時候，我們輸出樣式為藍色的線，如果是 0.3~1.0 的話，則是輸出為綠色的線段，當然也可以針對填色與透明度等等做設定。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">dataMap.setStyle(function(feature)&#123;</div><div class="line">  if( feature.getProperty(&apos;name&apos;) === &apos;0.3&apos;)&#123;</div><div class="line">    return &#123; fillOpacity: 0.35, fillColor: &apos;#0070FF&apos;, strokeWeight: 2, strokeColor: &apos;#0070FF&apos;, strokeOpacity: 1 &#125;;</div><div class="line">  &#125;</div><div class="line">  if( feature.getProperty(&apos;name&apos;) === &apos;0.3~1.0&apos;)&#123;</div><div class="line">    return &#123; fillOpacity: 0.35, fillColor: &apos;#54FF00&apos;, strokeWeight: 2, strokeColor: &apos;#54FF00&apos;, strokeOpacity: 1 &#125;;</div><div class="line">  &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>結果呈現像這樣：
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/302535/lNUGoyd7RB2MOsx8i1cw_image.png" alt="image.png"></p>
+<p>這裏也有 Online Demo: <a href="http://kurotanshi.github.io/TPEDisasterSummary/rain/rain_tp_map.html" target="_blank" rel="external">http://kurotanshi.github.io/TPEDisasterSummary/rain/rain_tp_map.html</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;看到前兩天的新聞: &lt;a href=&quot;https://tw.news.yahoo.com/%E6%9F%AF%E6%96%87%E5%93%B2%E6%83%B3%E5%85%AC%E9%96%8B%E6%98%93%E6%B7%B9%E6%B0%B4%E5%9C%B0%E
+    
+    </summary>
+    
+      <category term="OpenData" scheme="https://kuro.tw/categories/OpenData/"/>
+    
+    
+      <category term="google map" scheme="https://kuro.tw/tags/google-map/"/>
+    
+      <category term="opendata" scheme="https://kuro.tw/tags/opendata/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>[筆記] JavaScript 變數宣告與作用域</title>
+    <link href="https://kuro.tw/posts/2015/07/08/note-javascript-variables-declared-with-the-scope-scope/"/>
+    <id>https://kuro.tw/posts/2015/07/08/note-javascript-variables-declared-with-the-scope-scope/</id>
+    <published>2015-07-08T02:11:00.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>大家都知道，JavaScript 的變數有其作用域的範圍，若使用前未經 var 宣告，就會自動變成全域變數 (global variable)，而在其 code block 內宣告的變數也只有該 code block 內可以使用。</p>
+<p>這次的問題，其實很久以前在 tonyQ 的聚會上就聽他說過了，<del>只是沒想到還真的會遇到 XDDDD</del></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</div><div class="line"></div><div class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(a);		<span class="comment">// 1</span></div><div class="line">&#125;)();</div></pre></td></tr></table></figure>
+<p>上面的 code 很簡單，就是宣告一個全域變數 a，然後值為 1 ，因為是全域變數，所以在之後的匿名函式內可以使用它。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</div><div class="line"></div><div class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">  <span class="keyword">var</span> a = <span class="number">100</span>;</div><div class="line">  <span class="built_in">console</span>.log(a);		<span class="comment">// 100</span></div><div class="line">&#125;)();</div></pre></td></tr></table></figure>
+<p>這次，在匿名函式內，我們另外宣告了一個 a，值為 100，因為其作用域的關係，所以 console 的結果會是 100。</p>
+<p>接著，問題來了，如果我們在 <code>var a = 100;</code> 之前去取值，會發生什麼事呢？
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</div><div class="line"></div><div class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(a);    <span class="comment">//  ?</span></div><div class="line">  <span class="keyword">var</span> a = <span class="number">100</span>;</div><div class="line">  <span class="built_in">console</span>.log(a);    <span class="comment">// 100</span></div><div class="line">&#125;)();</div></pre></td></tr></table></figure></p>
+<p>答案是，第一次的 console.log(a) 會印出 <strong>undefined</strong>，而第二次會出現 100。</p>
+<p>因為在匿名函數獨立的 scope 內，不管 var 是放在最前面，或是最後一行，他的變數實體在該 code block 一開始就是新的了，也就是說，剛剛的 code 其實等同下面這段：
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</div><div class="line"></div><div class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">  <span class="keyword">var</span> a;</div><div class="line">  <span class="built_in">console</span>.log(a);    <span class="comment">// undefined</span></div><div class="line">  a = <span class="number">100</span>;</div><div class="line">  <span class="built_in">console</span>.log(a);    <span class="comment">// 100</span></div><div class="line">&#125;)();</div></pre></td></tr></table></figure></p>
+<p>所以第一次會印出 undefined 。</p>
+<p>要怎麼排除這樣的問題呢，很簡單，要嘛一開始就不要取相同名稱，要嘛就透過參數的方式代入原本的變數，像這樣：
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</div><div class="line"></div><div class="line">(<span class="function"><span class="keyword">function</span>(<span class="params">_a</span>)</span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(_a);    <span class="comment">// 1</span></div><div class="line">  <span class="keyword">var</span> a = <span class="number">100</span>;</div><div class="line">  <span class="built_in">console</span>.log(a);    <span class="comment">// 100</span></div><div class="line">&#125;)(a);</div></pre></td></tr></table></figure></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;大家都知道，JavaScript 的變數有其作用域的範圍，若使用前未經 var 宣告，就會自動變成全域變數 (global variable)，而在其 code block 內宣告的變數也只有該 code block 內可以使用。&lt;/p&gt;
+&lt;p&gt;這次的問題，其實很久以前在 
+    
+    </summary>
+    
+      <category term="javascript" scheme="https://kuro.tw/categories/javascript/"/>
+    
+    
+      <category term="javascript" scheme="https://kuro.tw/tags/javascript/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Taipei D3.js Meetup 小聚分享心得</title>
+    <link href="https://kuro.tw/posts/2015/06/18/taipei-d3js-meetup-gathering-to-share-experiences/"/>
+    <id>https://kuro.tw/posts/2015/06/18/taipei-d3js-meetup-gathering-to-share-experiences/</id>
+    <published>2015-06-18T05:32:00.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>這次我在 <a href="http://www.meetup.com/Taipei-D3-js-Meetup/" title="Taipei D3.js Meetup" target="_blank" rel="external">Taipei D3.js Meetup</a> (現在似乎改叫 Visual Thursday) 分享的 Talk 是有關於地理視覺化的簡介，雖然題目聽起來很學術，但其實內容是我這陣子對於 Web GIS 以及地圖視覺化的一些摸索心得分享。</p>
+<p>感謝台灣微軟提供場地 XD</p>
+<p>下面是我的投影片</p>
+<iframe src="https://www.slideshare.net/slideshow/embed_code/key/mhzctMFXFoHMJn" width="476" height="400" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="margin-bottom:1em;"></iframe>
+
+
+<p>這次幾個 Demo 的原始碼都放在 Github 上： <a href="https://github.com/kurotanshi/VisualThursday_demo" target="_blank" rel="external">https://github.com/kurotanshi/VisualThursday_demo</a>
+有興趣的朋友可以自行下載研究。</p>
+<p>想看 Online Demo 的也可以直接到這： <a href="http://kurotanshi.github.io/VisualThursday_demo/" target="_blank" rel="external">http://kurotanshi.github.io/VisualThursday_demo/</a></p>
+<p>雖然都是以 Google Map 為範例，但是大部份的圖資系統如 leaflet.js / MapBox 等都是通用的，尤其是 <a href="http://turfjs.org/" title="http://turfjs.org/" target="_blank" rel="external">Turf.js</a> 這個地理資訊分析的工具，十分強大，可以直接針對 geojson 做運算，也可以透過 node 在後端執行運算。至今我還在摸索它的功能，也許未來更加熟練後可以再來分享給大家。</p>
+<p>謝謝所有在端午連假前仍願意來參與活動的朋友，大家端午節快樂 :)</p>
+<p>最後，我們還有很多專案想實現，歡迎有志之士加入！</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;這次我在 &lt;a href=&quot;http://www.meetup.com/Taipei-D3-js-Meetup/&quot; title=&quot;Taipei D3.js Meetup&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Taipei D3.js Meetup&lt;
+    
+    </summary>
+    
+      <category term="D3.js" scheme="https://kuro.tw/categories/D3-js/"/>
+    
+    
+      <category term="opendata" scheme="https://kuro.tw/tags/opendata/"/>
+    
+      <category term="D3.js" scheme="https://kuro.tw/tags/D3-js/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>[JS] [Note] TWD97 標轉換爲 經緯度 </title>
+    <link href="https://kuro.tw/posts/2015/06/11/js-note-twd97-convert-to-longitude-and-latitude/"/>
+    <id>https://kuro.tw/posts/2015/06/11/js-note-twd97-convert-to-longitude-and-latitude/</id>
+    <published>2015-06-11T03:18:00.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>因為從臺北市政府資料開放平台 API 拿到的資料是 TWD97 座標格式，所以我們必須要將它轉成經緯度後才能套用至 Google Map 使用。網路上查了很多資料，最後找到最親民的是米蟲大的 PHP 版本，於是就改成寫我最熟悉的 JS。</p>
+<p>reference:
+<a href="http://blog.xuite.net/vexed/tech/53749528-TWD97+%E5%BA%A7%E6%A8%99%E8%BD%89%E7%B6%93%E7%B7%AF%E5%BA%A6" target="_blank" rel="external">Vexed&#39;s Blog - TWD97 座標轉經緯度</a></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">twd97_to_latlng</span>(<span class="params">$x, $y</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> pow = <span class="built_in">Math</span>.pow, M_PI = <span class="built_in">Math</span>.PI;</div><div class="line">  <span class="keyword">var</span> sin = <span class="built_in">Math</span>.sin, cos = <span class="built_in">Math</span>.cos, tan = <span class="built_in">Math</span>.tan;</div><div class="line">  <span class="keyword">var</span> $a = <span class="number">6378137.0</span>, $b = <span class="number">6356752.314245</span>;</div><div class="line">  <span class="keyword">var</span> $lng0 = <span class="number">121</span> * M_PI / <span class="number">180</span>, $k0 = <span class="number">0.9999</span>, $dx = <span class="number">250000</span>, $dy = <span class="number">0</span>;</div><div class="line">  <span class="keyword">var</span> $e = pow((<span class="number">1</span> - pow($b, <span class="number">2</span>) / pow($a, <span class="number">2</span>)), <span class="number">0.5</span>);</div><div class="line"></div><div class="line">  $x -= $dx;</div><div class="line">  $y -= $dy;</div><div class="line"></div><div class="line">  <span class="keyword">var</span> $M = $y / $k0;</div><div class="line"></div><div class="line">  <span class="keyword">var</span> $mu = $M / ($a * (<span class="number">1.0</span> - pow($e, <span class="number">2</span>) / <span class="number">4.0</span> - <span class="number">3</span> * pow($e, <span class="number">4</span>) / <span class="number">64.0</span> - <span class="number">5</span> * pow($e, <span class="number">6</span>) / <span class="number">256.0</span>));</div><div class="line">  <span class="keyword">var</span> $e1 = (<span class="number">1.0</span> - pow((<span class="number">1.0</span> - pow($e, <span class="number">2</span>)), <span class="number">0.5</span>)) / (<span class="number">1.0</span> + pow((<span class="number">1.0</span> - pow($e, <span class="number">2</span>)), <span class="number">0.5</span>));</div><div class="line"></div><div class="line">  <span class="keyword">var</span> $J1 = (<span class="number">3</span> * $e1 / <span class="number">2</span> - <span class="number">27</span> * pow($e1, <span class="number">3</span>) / <span class="number">32.0</span>);</div><div class="line">  <span class="keyword">var</span> $J2 = (<span class="number">21</span> * pow($e1, <span class="number">2</span>) / <span class="number">16</span> - <span class="number">55</span> * pow($e1, <span class="number">4</span>) / <span class="number">32.0</span>);</div><div class="line">  <span class="keyword">var</span> $J3 = (<span class="number">151</span> * pow($e1, <span class="number">3</span>) / <span class="number">96.0</span>);</div><div class="line">  <span class="keyword">var</span> $J4 = (<span class="number">1097</span> * pow($e1, <span class="number">4</span>) / <span class="number">512.0</span>);</div><div class="line"></div><div class="line">  <span class="keyword">var</span> $fp = $mu + $J1 * sin(<span class="number">2</span> * $mu) + $J2 * sin(<span class="number">4</span> * $mu) + $J3 * sin(<span class="number">6</span> * $mu) + $J4 * sin(<span class="number">8</span> * $mu);</div><div class="line"></div><div class="line">  <span class="keyword">var</span> $e2 = pow(($e * $a / $b), <span class="number">2</span>);</div><div class="line">  <span class="keyword">var</span> $C1 = pow($e2 * cos($fp), <span class="number">2</span>);</div><div class="line">  <span class="keyword">var</span> $T1 = pow(tan($fp), <span class="number">2</span>);</div><div class="line">  <span class="keyword">var</span> $R1 = $a * (<span class="number">1</span> - pow($e, <span class="number">2</span>)) / pow((<span class="number">1</span> - pow($e, <span class="number">2</span>) * pow(sin($fp), <span class="number">2</span>)), (<span class="number">3.0</span> / <span class="number">2.0</span>));</div><div class="line">  <span class="keyword">var</span> $N1 = $a / pow((<span class="number">1</span> - pow($e, <span class="number">2</span>) * pow(sin($fp), <span class="number">2</span>)), <span class="number">0.5</span>);</div><div class="line"></div><div class="line">  <span class="keyword">var</span> $D = $x / ($N1 * $k0);</div><div class="line"></div><div class="line">  <span class="keyword">var</span> $Q1 = $N1 * tan($fp) / $R1;</div><div class="line">  <span class="keyword">var</span> $Q2 = (pow($D, <span class="number">2</span>) / <span class="number">2.0</span>);</div><div class="line">  <span class="keyword">var</span> $Q3 = (<span class="number">5</span> + <span class="number">3</span> * $T1 + <span class="number">10</span> * $C1 - <span class="number">4</span> * pow($C1, <span class="number">2</span>) - <span class="number">9</span> * $e2) * pow($D, <span class="number">4</span>) / <span class="number">24.0</span>;</div><div class="line">  <span class="keyword">var</span> $Q4 = (<span class="number">61</span> + <span class="number">90</span> * $T1 + <span class="number">298</span> * $C1 + <span class="number">45</span> * pow($T1, <span class="number">2</span>) - <span class="number">3</span> * pow($C1, <span class="number">2</span>) - <span class="number">252</span> * $e2) * pow($D, <span class="number">6</span>) / <span class="number">720.0</span>;</div><div class="line">  <span class="keyword">var</span> $lat = $fp - $Q1 * ($Q2 - $Q3 + $Q4);</div><div class="line"></div><div class="line">  <span class="keyword">var</span> $Q5 = $D;</div><div class="line">  <span class="keyword">var</span> $Q6 = (<span class="number">1</span> + <span class="number">2</span> * $T1 + $C1) * pow($D, <span class="number">3</span>) / <span class="number">6</span>;</div><div class="line">  <span class="keyword">var</span> $Q7 = (<span class="number">5</span> - <span class="number">2</span> * $C1 + <span class="number">28</span> * $T1 - <span class="number">3</span> * pow($C1, <span class="number">2</span>) + <span class="number">8</span> * $e2 + <span class="number">24</span> * pow($T1, <span class="number">2</span>)) * pow($D, <span class="number">5</span>) / <span class="number">120.0</span>;</div><div class="line">  <span class="keyword">var</span> $lng = $lng0 + ($Q5 - $Q6 + $Q7) / cos($fp);</div><div class="line"></div><div class="line">  $lat = ($lat * <span class="number">180</span>) / M_PI;</div><div class="line">  $lng = ($lng * <span class="number">180</span>) / M_PI;</div><div class="line"></div><div class="line">  <span class="keyword">return</span> &#123;</div><div class="line">    <span class="attr">lat</span>: $lat,</div><div class="line">    <span class="attr">lng</span>: $lng</div><div class="line">  &#125;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;因為從臺北市政府資料開放平台 API 拿到的資料是 TWD97 座標格式，所以我們必須要將它轉成經緯度後才能套用至 Google Map 使用。網路上查了很多資料，最後找到最親民的是米蟲大的 PHP 版本，於是就改成寫我最熟悉的 JS。&lt;/p&gt;
+&lt;p&gt;reference:
+
+    
+    </summary>
+    
+      <category term="GIS" scheme="https://kuro.tw/categories/GIS/"/>
+    
+    
+      <category term="twd97" scheme="https://kuro.tw/tags/twd97/"/>
+    
+      <category term="gis" scheme="https://kuro.tw/tags/gis/"/>
+    
+      <category term="opendata" scheme="https://kuro.tw/tags/opendata/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>在 Google Map 加入 D3 圖像 - 2</title>
+    <link href="https://kuro.tw/posts/2015/05/20/added-to-the-google-map-images-d3-2/"/>
+    <id>https://kuro.tw/posts/2015/05/20/added-to-the-google-map-images-d3-2/</id>
+    <published>2015-05-20T07:49:00.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p><a href="http://kuro.tw/posts/2015/05/20/join-the-d3-in-google-map-image" title="在 Google Map 加入 D3 圖像 ">上一篇</a>提到了如何在 Google Map 裡面加入 D3 的圖像，這次我們實際將資料套進去吧。</p>
+<p>資料來源是上篇提到的<a href="http://data.taipei/opendata/datalist/datasetMeta?oid=1d71c478-205f-42c5-8386-35f86d74fdd1" target="_blank" rel="external">臺北捷運各站進出量統計</a>的統計資料，因為台北市政府開放平台並沒有提供 CORS (跨來源資源共享)的服務，沒關係，我們直接將資料下載存成 json 檔案即可。 (範例為 2015/4 進出站人數)</p>
+<p>按照慣例，先看結果 - Demo: <a href="http://jsbin.com/wexiva/3/" target="_blank" rel="external">http://jsbin.com/wexiva/3/</a>
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/276658/4DhTbWRwSvujvsxZC2Z5_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-05-20%20%E4%B8%8B%E5%8D%8811.54.46.png" alt="螢幕快照 2015-05-20 下午11.54.46.png"></p>
+<p>藍色的是進站人數，橘色的是出站人數。可以看出各站在 4/1 的進出站人數相當平均。</p>
+<p>因為這次抓取的資料比較多，所以程式也稍微複雜一點，不過沒關係，概念還是很簡單的。
+不囉唆直接看 code.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> map;</div><div class="line"><span class="keyword">var</span> overlay = <span class="keyword">new</span> google.maps.OverlayView();</div><div class="line"><span class="keyword">var</span> sta_in = [], sta_out = [], mrtData;</div><div class="line"></div><div class="line"><span class="comment">// 讀取資料, sta_in = 2015 年四月進站人數, sta_out = 2015 年四月出站人數.</span></div><div class="line"><span class="comment">// 資料來源: http://data.taipei/opendata/datalist/datasetMeta?oid=1d71c478-205f-42c5-8386-35f86d74fdd1</span></div><div class="line">d3.csv(<span class="string">"https://dl.dropboxusercontent.com/u/12537630/mrt.csv"</span>,</div><div class="line"><span class="function"><span class="keyword">function</span>(<span class="params">data</span>)</span>&#123;</div><div class="line">  mrtData = data;</div><div class="line"></div><div class="line">  <span class="comment">// 進站</span></div><div class="line">  d3.json(<span class="string">"https://dl.dropboxusercontent.com/u/12537630/mrt-in-april.json"</span>,</div><div class="line">  <span class="function"><span class="keyword">function</span>(<span class="params">error, json</span>) </span>&#123;</div><div class="line">    sta_in = json.result.results;</div><div class="line">    <span class="keyword">if</span>( sta_in.length &gt; <span class="number">0</span> &amp;&amp; sta_out.length &gt; <span class="number">0</span> ) &#123; drawMap(); &#125;</div><div class="line">  &#125;);</div><div class="line"></div><div class="line">  <span class="comment">// 出站</span></div><div class="line">  d3.json(<span class="string">"https://dl.dropboxusercontent.com/u/12537630/mrt-out-april.json"</span>,</div><div class="line">  <span class="function"><span class="keyword">function</span>(<span class="params">error, json</span>) </span>&#123;</div><div class="line">    sta_out = json.result.results;</div><div class="line">    <span class="keyword">if</span>( sta_in.length &gt; <span class="number">0</span> &amp;&amp; sta_out.length &gt; <span class="number">0</span> ) &#123; drawMap(); &#125;</div><div class="line">  &#125;);</div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">drawMap</span>(<span class="params"></span>) </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">// 設定圓餅圖長寬, 半徑</span></div><div class="line">    <span class="keyword">var</span> width = <span class="number">35</span>, height = <span class="number">40</span>, radius = <span class="built_in">Math</span>.min(width, height) / <span class="number">2</span>;</div><div class="line"></div><div class="line">    <span class="comment">// 透過 d3.scale.category10() 生成顏色</span></div><div class="line">    <span class="keyword">var</span> color = d3.scale.category10();</div><div class="line"></div><div class="line">truetrue<span class="comment">// d3.layout.pie()</span></div><div class="line">truetrue<span class="keyword">var</span> pie = d3.layout.pie();</div><div class="line"></div><div class="line">    <span class="comment">// 設定圓餅內外層半徑, 這裏內層設 0.</span></div><div class="line">    <span class="keyword">var</span> arc = d3.svg.arc()</div><div class="line">        .innerRadius(<span class="number">0</span>)</div><div class="line">        .outerRadius(radius);</div><div class="line"></div><div class="line">    overlay.onAdd = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="keyword">var</span> layer = d3.select(<span class="keyword">this</span>.getPanes().overlayLayer).append(<span class="string">"div"</span>)</div><div class="line">            .attr(<span class="string">"class"</span>, <span class="string">"stations"</span>);</div><div class="line"></div><div class="line">        overlay.draw = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">            <span class="keyword">var</span> projection = <span class="keyword">this</span>.getProjection(),</div><div class="line">                padding = <span class="number">16</span>;</div><div class="line"></div><div class="line">            <span class="comment">// 針對每一筆捷運站增加 marker</span></div><div class="line">            <span class="keyword">var</span> marker = layer.selectAll(<span class="string">"svg"</span>)</div><div class="line">                .data(d3.entries(mrtData))</div><div class="line">                .each(transform)</div><div class="line">                .enter().append(<span class="string">"svg"</span>)</div><div class="line">                .each(transform)</div><div class="line">                .attr(&#123;</div><div class="line">                    <span class="string">'class'</span>: <span class="string">"marker"</span>,</div><div class="line">                    <span class="string">"width"</span>: width,</div><div class="line">                    <span class="string">"height"</span>: height,</div><div class="line">                    <span class="string">"transform"</span>: <span class="string">"translate("</span> + width / <span class="number">2</span> + <span class="string">","</span> + height / <span class="number">2</span> + <span class="string">")"</span>,</div><div class="line">                &#125;);</div><div class="line"></div><div class="line">            <span class="comment">// 將取得的進出站資料透過 .data( pie([ 進站人數, 出站人數 ]) ) 指定到圓餅圖中。</span></div><div class="line">            <span class="comment">// sta_in[0] 代表 4/1 進站人數, sta_out[0] 代表 4/1 出站人數.</span></div><div class="line">            <span class="keyword">var</span> g = marker.selectAll(<span class="string">"g"</span>)</div><div class="line">                .data(<span class="function"><span class="keyword">function</span>(<span class="params">d, i</span>) </span>&#123;</div><div class="line">                    <span class="keyword">return</span> pie([<span class="built_in">parseInt</span>(sta_in[<span class="number">0</span>][d.value.name].replace(<span class="string">','</span>, <span class="string">''</span>), <span class="number">10</span>), <span class="built_in">parseInt</span>(sta_out[<span class="number">0</span>][d.value.name].replace(<span class="string">','</span>, <span class="string">''</span>), <span class="number">10</span>)]);</div><div class="line">                &#125;)</div><div class="line">                .enter()</div><div class="line">                .append(<span class="string">"g"</span>);</div><div class="line"></div><div class="line">            <span class="comment">// 著色</span></div><div class="line">            g.append(<span class="string">"path"</span>)</div><div class="line">                .attr(&#123;</div><div class="line">                  <span class="string">"fill"</span>: <span class="function"><span class="keyword">function</span>(<span class="params">d, i</span>) </span>&#123; <span class="keyword">return</span> color(i); &#125;,</div><div class="line">                  <span class="string">"d"</span>, arc,</div><div class="line">                  <span class="string">"transform"</span>: <span class="string">"translate("</span> + width / <span class="number">2</span> + <span class="string">","</span> + height / <span class="number">2</span> + <span class="string">")"</span></div><div class="line">                &#125;);</div><div class="line"></div><div class="line">            <span class="comment">// 加入標籤</span></div><div class="line">            marker.append(<span class="string">"text"</span>)</div><div class="line">                .attr(<span class="string">"x"</span>, padding + <span class="number">7</span>)</div><div class="line">                .attr(<span class="string">"y"</span>, padding)</div><div class="line">                .attr(<span class="string">"dy"</span>, <span class="string">".31em"</span>)</div><div class="line">                .text(<span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123;</div><div class="line">                    <span class="keyword">return</span> d.value.name;</div><div class="line">                &#125;);</div><div class="line"></div><div class="line">            <span class="function"><span class="keyword">function</span> <span class="title">transform</span>(<span class="params">d</span>) </span>&#123;</div><div class="line">                d = <span class="keyword">new</span> google.maps.LatLng(d.value.lat, d.value.lng);</div><div class="line">                d = projection.fromLatLngToDivPixel(d);</div><div class="line">                <span class="keyword">return</span> d3.select(<span class="keyword">this</span>)</div><div class="line">                    .style(<span class="string">"left"</span>, (d.x - padding) + <span class="string">"px"</span>)</div><div class="line">                    .style(<span class="string">"top"</span>, (d.y - padding) + <span class="string">"px"</span>);</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line"></div><div class="line">    &#125;;</div><div class="line">    overlay.setMap(map);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="本系列文章列表"><a href="#本系列文章列表" class="headerlink" title="本系列文章列表:"></a>本系列文章列表:</h4><ul>
+<li><a href="http://kuro.tw/posts/2015/05/20/join-the-d3-in-google-map-image">在 Google Map 加入 D3 圖像 (1)</a></li>
+<li><a href="http://kuro.tw/posts/2015/05/20/added-to-the-google-map-images-d3-2">在 Google Map 加入 D3 圖像 (2)</a></li>
+</ul>
+<hr>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;a href=&quot;http://kuro.tw/posts/2015/05/20/join-the-d3-in-google-map-image&quot; title=&quot;在 Google Map 加入 D3 圖像 &quot;&gt;上一篇&lt;/a&gt;提到了如何在 Google Map 裡面加入 D3
+    
+    </summary>
+    
+      <category term="D3.js" scheme="https://kuro.tw/categories/D3-js/"/>
+    
+    
+      <category term="google map" scheme="https://kuro.tw/tags/google-map/"/>
+    
+      <category term="d3.js" scheme="https://kuro.tw/tags/d3-js/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>在 Google Map 加入 D3 圖像</title>
+    <link href="https://kuro.tw/posts/2015/05/19/join-the-d3-in-google-map-image/"/>
+    <id>https://kuro.tw/posts/2015/05/19/join-the-d3-in-google-map-image/</id>
+    <published>2015-05-19T08:05:00.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>因為昨天 <a href="http://data.taipei/" target="_blank" rel="external">台北市政府開放平台</a> 開始提供 <a href="http://data.taipei/opendata/datalist/datasetMeta?oid=1d71c478-205f-42c5-8386-35f86d74fdd1" target="_blank" rel="external">臺北捷運各站進出量統計</a> 的統計資料，所以就在思考可以利用這份資料做什麼應用，第一個想到的就是能否透過 D3 與地圖的共同呈現，當然就從我最熟悉的 Google Map 開始。</p>
+<p>不過這篇文章只會介紹到如何在 Google Map 加入 D3 (SVG) 圖像。
+等我將捷運各站資訊加入後也許會還有下回，哈哈哈。</p>
+<p>先看結果 - Demo: <a href="http://output.jsbin.com/wexiva/1/" target="_blank" rel="external">http://output.jsbin.com/wexiva/1/</a>
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/276547/NyZaTlSTDuH8v6DRzWAY_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-05-19%20%E4%B8%8B%E5%8D%8811.34.22.png" alt="螢幕快照 2015-05-19 下午11.34.22.png"></p>
+<p>整個程式非常簡單，首先在 Google map 加入一個 <code>google.maps.OverlayView()</code>，然後透過 <code>d3.csv</code> 載入資料。在繪製 marker (圓點) 的時候，透過自訂的 <code>transform function</code> 去指定它的座標就完成了。</p>
+<p>相關程式如下:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="comment">// 捷運各站經緯度資訊: https://dl.dropboxusercontent.com/u/12537630/mrt.csv</span></div><div class="line"><span class="comment">// 資料來源: https://github.com/repeat/taipei-metro-stations</span></div><div class="line"></div><div class="line">d3.csv(<span class="string">"https://dl.dropboxusercontent.com/u/12537630/mrt.csv"</span>, <span class="function"><span class="keyword">function</span>(<span class="params">data</span>)</span>&#123;</div><div class="line">  <span class="keyword">var</span> overlay = <span class="keyword">new</span> google.maps.OverlayView();</div><div class="line"></div><div class="line">  <span class="comment">// 新增 OverlayView 到 google map</span></div><div class="line">  overlay.onAdd = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> layer = d3.select(<span class="keyword">this</span>.getPanes().overlayLayer).append(<span class="string">"div"</span>)</div><div class="line">        .attr(<span class="string">"class"</span>, <span class="string">"stations"</span>);</div><div class="line"></div><div class="line">    overlay.draw = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">      <span class="keyword">var</span> projection = <span class="keyword">this</span>.getProjection(), padding = <span class="number">16</span>;</div><div class="line"></div><div class="line">      <span class="keyword">var</span> marker = layer.selectAll(<span class="string">"svg"</span>)</div><div class="line">          .data(d3.entries(data))</div><div class="line">          .each(transform)</div><div class="line">          .enter().append(<span class="string">"svg:svg"</span>)</div><div class="line">            .each(transform)</div><div class="line">            .attr(<span class="string">"class"</span>, <span class="string">"marker"</span>);</div><div class="line"></div><div class="line">      <span class="comment">// 加入圓點</span></div><div class="line">      marker.append(<span class="string">"svg:circle"</span>)</div><div class="line">          .attr(<span class="string">"r"</span>, <span class="number">6</span>)</div><div class="line">          .attr(<span class="string">"cx"</span>, padding)</div><div class="line">          .attr(<span class="string">"cy"</span>, padding);</div><div class="line"></div><div class="line">      <span class="comment">// 加入標籤</span></div><div class="line">      marker.append(<span class="string">"svg:text"</span>)</div><div class="line">          .attr(<span class="string">"x"</span>, padding + <span class="number">7</span>)</div><div class="line">          .attr(<span class="string">"y"</span>, padding)</div><div class="line">          .attr(<span class="string">"dy"</span>, <span class="string">".31em"</span>)</div><div class="line">          .text(<span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123; <span class="keyword">return</span> d.value.name; &#125;);</div><div class="line"></div><div class="line">      <span class="comment">// transform function. 指定每個點的座標.</span></div><div class="line">      <span class="function"><span class="keyword">function</span> <span class="title">transform</span>(<span class="params">d</span>) </span>&#123;</div><div class="line">        d = <span class="keyword">new</span> google.maps.LatLng(d.value.lat, d.value.lng);</div><div class="line">        d = projection.fromLatLngToDivPixel(d);</div><div class="line">        <span class="keyword">return</span> d3.select(<span class="keyword">this</span>)</div><div class="line">            .style(<span class="string">"left"</span>, (d.x - padding) + <span class="string">"px"</span>)</div><div class="line">            .style(<span class="string">"top"</span>, (d.y - padding) + <span class="string">"px"</span>);</div><div class="line">      &#125;</div><div class="line">    &#125;;</div><div class="line">  &#125;;</div><div class="line"></div><div class="line">  <span class="comment">// 將 overlay 加入到 google 地圖</span></div><div class="line">  overlay.setMap(map);</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<h4 id="參考"><a href="#參考" class="headerlink" title="參考:"></a>參考:</h4><ul>
+<li><a href="http://bl.ocks.org/mbostock/899711" target="_blank" rel="external">http://bl.ocks.org/mbostock/899711</a></li>
+<li><a href="https://developers.google.com/maps/documentation/javascript/customoverlays?hl=zh-tw" target="_blank" rel="external">https://developers.google.com/maps/documentation/javascript/customoverlays?hl=zh-tw</a></li>
+</ul>
+<hr>
+<h4 id="本系列文章列表"><a href="#本系列文章列表" class="headerlink" title="本系列文章列表:"></a>本系列文章列表:</h4><ul>
+<li><a href="http://kuro.tw/posts/2015/05/20/join-the-d3-in-google-map-image">在 Google Map 加入 D3 圖像 (1)</a></li>
+<li><a href="http://kuro.tw/posts/2015/05/20/added-to-the-google-map-images-d3-2">在 Google Map 加入 D3 圖像 (2)</a></li>
+</ul>
+<hr>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;因為昨天 &lt;a href=&quot;http://data.taipei/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;台北市政府開放平台&lt;/a&gt; 開始提供 &lt;a href=&quot;http://data.taipei/opendata/datalist/datase
+    
+    </summary>
+    
+      <category term="D3.js" scheme="https://kuro.tw/categories/D3-js/"/>
+    
+    
+      <category term="google map" scheme="https://kuro.tw/tags/google-map/"/>
+    
+      <category term="d3.js" scheme="https://kuro.tw/tags/d3-js/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Modern WebConf 2015 與我的講題：D3 圖表優化二三事</title>
+    <link href="https://kuro.tw/posts/2015/05/17/modern-webconf-2015-with-my-theme-d3-optimizing-two-or-three-things/"/>
+    <id>https://kuro.tw/posts/2015/05/17/modern-webconf-2015-with-my-theme-d3-optimizing-two-or-three-things/</id>
+    <published>2015-05-17T05:59:00.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>下面投影片是這次小弟在 Modern WebConf 2015 分享的主題，內容是有關 D3 開發的一些心得。</p>
+<p>其實早先在準備的時候有些忐忑，像這種大拜拜的演講場合，很難預想聽眾的程度，講題太深擔心會眾無法吸收，太淺又怕對不起會眾的期待。 所以這次的內容安排了三分之一是從最基礎的 D3 data-driven 講起，再來才是開發心得與特性的介紹，期望不管是剛入門的朋友或是已經投入開發的老手都能從中獲得些什麼。因為我認為 Data-Driven 是 D3.js 的核心觀念之一，在瞭解如何將資料轉為 DOM / SVG 元件以後，剩下再去讀 D3 的 API 相信也能輕易上手。</p>
+<p><a href="http://audrey.nu/-/2015/05/16/open-source-enlightenment-2015" title="開源之道 2015 " target="_blank" rel="external">「萬事萬物都有缺口，缺口就是光的入口」</a>，如果有什麼是我講的不對的地方，也歡迎 <del>用力打臉</del> 糾正，畢竟我都這麼厚臉皮出來分享了，讓小弟我有機會獲得正確答案應該不過分，哈哈哈。</p>
+<p>最後，在這裡預告一下，感謝 <a href="http://www.meetup.com/Taipei-D3-js-Meetup/" title="Taipei D3.js Meetup" target="_blank" rel="external">Taipei D3.js Meetup</a> 的邀約，預計在六月份會有一場小聚的分享，題目還在構思當中。 如果你對 D3 相關議題也有興趣，歡迎與我交流。 :)</p>
+<p>無論如何，還是感謝每一位參與 Modern WebConf 的會眾、講師以及工作人員。辛苦了。</p>
+<p><iframe src="//www.slideshare.net/slideshow/embed_code/key/NdKfJWerFlauo9" width="510" height="420" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/kurotanshi/d3-48180820" title="[Modern WebConf 2015] D3 圖表優化二三事" target="_blank">[Modern WebConf 2015] D3 圖表優化二三事</a> </strong> from <strong><a href="//www.slideshare.net/kurotanshi" target="_blank">Kuro Hsu</a></strong> </div></p>
+<p><div style="margin-top:2em;">偷偷在底下擺張 JavaScript 之父 Brendan Eich，與小弟 <del>(自稱 JS 之子)</del> 的合照炫耀一下 XD</div>
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/276313/SIxIklSuRka61onbK0IK_IMG_8751.jpg" alt="IMG_8751.jpg"></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;下面投影片是這次小弟在 Modern WebConf 2015 分享的主題，內容是有關 D3 開發的一些心得。&lt;/p&gt;
+&lt;p&gt;其實早先在準備的時候有些忐忑，像這種大拜拜的演講場合，很難預想聽眾的程度，講題太深擔心會眾無法吸收，太淺又怕對不起會眾的期待。 所以這次的內容安排了
+    
+    </summary>
+    
+      <category term="ModernWebConf" scheme="https://kuro.tw/categories/ModernWebConf/"/>
+    
+    
+      <category term="d3.js" scheme="https://kuro.tw/tags/d3-js/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>[筆記] 阻擋 android chrome 網頁下拉自動重整頁面</title>
+    <link href="https://kuro.tw/posts/2015/05/11/note-blocking-android-chrome-page-drop-down-automatically-restructure-page/"/>
+    <id>https://kuro.tw/posts/2015/05/11/note-blocking-android-chrome-page-drop-down-automatically-restructure-page/</id>
+    <published>2015-05-11T07:00:00.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>早上開會時，同事提到了 Android 升級後，Chrome for Android 會出現網頁畫面在瀏覽器頂端時，往下拉會重整頁面的問題(<del>其實應該說是 Feature XD</del>)，因為這個新功能會造成網頁使用上的一些困擾，於是試了幾種方式，發現可以阻擋網頁重整的動作，趁還有印象就把它記錄下來。</p>
+<p><img src="http://user-image.logdown.io/user/3292/blog/3340/post/275711/HX5wrVYQ8WW8gkKhK8rQ_2015-05-11%2015.12.02.jpg" alt="2015-05-11 15.12.02.jpg">
+(就是這個小圈圈，看到它就代表網頁要重整了)</p>
+<p>原理其實很簡單，就是在當 chrome 已經到達網頁頂端時，而且判斷 touchmove 是往下拉時，把事件阻擋掉，就可以了。</p>
+<p>可以用 Android 試試看。
+Demo: <a href="http://jsbin.com/conuga/1/" target="_blank" rel="external">http://jsbin.com/conuga/1/</a></p>
+<p>聽說 iOS 也有類似問題，不過我手邊沒有 iPhone，所以無法測試。 orz</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">window</span>.addEventListener(<span class="string">'load'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">var</span> isWindowTop = <span class="literal">false</span>;</div><div class="line">    <span class="keyword">var</span> lastTouchY = <span class="number">0</span>;</div><div class="line"></div><div class="line">    <span class="keyword">var</span> touchStartHandler = <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</div><div class="line">        <span class="keyword">if</span> (e.touches.length !== <span class="number">1</span>) <span class="keyword">return</span>;</div><div class="line">        lastTouchY = e.touches[<span class="number">0</span>].clientY;</div><div class="line">        isWindowTop = (<span class="built_in">window</span>.pageYOffset === <span class="number">0</span>);</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="keyword">var</span> touchMoveHandler = <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</div><div class="line">        <span class="keyword">var</span> touchY = e.touches[<span class="number">0</span>].clientY;</div><div class="line">        <span class="keyword">var</span> touchYmove = touchY - lastTouchY;</div><div class="line">        lastTouchY = touchY;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (isWindowTop) &#123;</div><div class="line">            isWindowTop = <span class="literal">false</span>;</div><div class="line">            <span class="comment">// 阻擋移動事件</span></div><div class="line">            <span class="keyword">if</span> (touchYmove &gt; <span class="number">0</span>) &#123;</div><div class="line">                e.preventDefault();</div><div class="line">                <span class="keyword">return</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="built_in">document</span>.addEventListener(<span class="string">'touchstart'</span>, touchStartHandler, <span class="literal">false</span>);</div><div class="line">    <span class="built_in">document</span>.addEventListener(<span class="string">'touchmove'</span>, touchMoveHandler, <span class="literal">false</span>);</div><div class="line"></div><div class="line">&#125;);</div></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;早上開會時，同事提到了 Android 升級後，Chrome for Android 會出現網頁畫面在瀏覽器頂端時，往下拉會重整頁面的問題(&lt;del&gt;其實應該說是 Feature XD&lt;/del&gt;)，因為這個新功能會造成網頁使用上的一些困擾，於是試了幾種方式，發現可以阻擋網
+    
+    </summary>
+    
+      <category term="android" scheme="https://kuro.tw/categories/android/"/>
+    
+    
+      <category term="android" scheme="https://kuro.tw/tags/android/"/>
+    
+      <category term="chrome" scheme="https://kuro.tw/tags/chrome/"/>
+    
+      <category term="mobile" scheme="https://kuro.tw/tags/mobile/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>[筆記] Shapefile to GeoJSON</title>
+    <link href="https://kuro.tw/posts/2015/05/05/note-shapefile-to-geojson/"/>
+    <id>https://kuro.tw/posts/2015/05/05/note-shapefile-to-geojson/</id>
+    <published>2015-05-04T22:45:00.000Z</published>
+    <updated>2017-06-07T05:16:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>因為每次轉檔都要查，索性把步驟記錄下來。</p>
+<p>首先要安裝 GDAL (Geospatial Data Abstraction Library) 這個程式，
+因為我是用 Mac ，所以在 terminal 輸入 <code>brew install gdal</code> 就可以了。</p>
+<p>其他作業系統的安裝方式可詳閱 <a href="http://www.gdal.org/" target="_blank" rel="external">http://www.gdal.org/</a> 。</p>
+<p>安裝好 gdal 之後，就可以透過 ogr2ogr 來執行轉檔，一樣在 terminal 輸入：</p>
+<p><code>ogr2ogr -f &quot;GeoJSON&quot; output.json source.shp</code></p>
+<p>以臺北市政府開放資料的<strong>臺北市區界圖</strong> ( <a href="http://data.taipei/opendata/datalist/datasetMeta?oid=1601ef3a-c253-4988-b047-943d9e786143" target="_blank" rel="external">http://data.taipei/opendata/datalist/datasetMeta?oid=1601ef3a-c253-4988-b047-943d9e786143</a> ) 提供的 Shapefile 來說，因為它的坐標系統是 EPSG:3826(TWD97/121分帶)，我們需要把它轉換成 WGS84經緯度(EPSG:4326)，所以透過 <code>-s_srs</code> 與 <code>-t_srs</code> 來分別指定轉換前與轉換後的座標系統：</p>
+<p><code>ogr2ogr -f &quot;GeoJSON&quot; -s_srs EPSG:3826 -t_srs EPSG:4326  output.json source.shp</code></p>
+<p>轉換後的 geojson 直接輸出到 google map 上：
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/263637/UrqBEFSmTuazvdty255S_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-05-05%20%E4%B8%8B%E5%8D%883.47.07.png" alt="螢幕快照 2015-05-05 下午3.47.07.png"></p>
+<p>就這樣。</p>
+<p>[補充]
+關於 GeoJson 送到 Google Map 的部分可以參考我的其他文章：
+<a href="http://kuro.tw/posts/2015/04/28/through-the-google-maps-api-geojson-data" title="透過 Google Maps API 處理 GeoJSON 資料">透過 Google Maps API 處理 GeoJSON 資料</a>
+<a href="http://kuro.tw/posts/2015/09/30/use-google-map-view-rainfall-simulation-of-flooding-in-taipei-city-map" title="利用 Google Map 檢視台北市降雨淹水模擬圖">利用 Google Map 檢視台北市降雨淹水模擬圖</a></p>
+<p>又，如果需要轉換成 TopoJSON 的話，也可以參考這篇： <a href="http://blog.infographics.tw/2015/04/visualize-geographics-with-d3js/" title="視覺化實戰 － D3.js 地理區塊視覺化" target="_blank" rel="external">視覺化實戰 － D3.js 地理區塊視覺化</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;因為每次轉檔都要查，索性把步驟記錄下來。&lt;/p&gt;
+&lt;p&gt;首先要安裝 GDAL (Geospatial Data Abstraction Library) 這個程式，
+因為我是用 Mac ，所以在 terminal 輸入 &lt;code&gt;brew install gdal&lt;/co
+    
+    </summary>
+    
+      <category term="GeoJSON" scheme="https://kuro.tw/categories/GeoJSON/"/>
+    
+    
+  </entry>
+  
+</feed>
