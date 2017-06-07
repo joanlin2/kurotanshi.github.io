@@ -3,9 +3,9 @@
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 ga('create','UA-27126624-1','auto');ga('send','pageview');</script></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">如何在 Vue-CLI 建立的開發環境呼叫跨域遠端 RESTful APIs</h1><a id="logo" href="/.">Kuro's Blog</a><p class="description"></p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> 首頁</i></a><a href="/archives/"><i class="fa fa-archive"> 所有文章</i></a><a href="/atom.xml"><i class="fa fa-rss"> 訂閱</i></a></div></div><div id="layout" class="pure-g"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">如何在 Vue-CLI 建立的開發環境呼叫跨域遠端 RESTful APIs</h1><div class="post-meta">Jun 7, 2017<span> | </span><span class="category"><a href="/categories/vue-js/">vue.js</a></span><script src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script><span id="busuanzi_container_page_pv"> | <span id="busuanzi_value_page_pv"></span><span> 閱讀</span></span></div><a data-disqus-identifier="posts/2017/06/07/如何在-Vue-CLI-建立的開發環境呼叫跨域遠端-RESTful-APIs/" href="/posts/2017/06/07/如何在-Vue-CLI-建立的開發環境呼叫跨域遠端-RESTful-APIs/#disqus_thread" class="disqus-comment-count"></a><div class="post-content"><p>前幾天在 VueTW 活動結束後，有朋友來問：Vue 的開發環境能不能在 local 端建立 proxy 服務來解決跨域讀取後端的 API，
-<del>隔壁棚的 Angular CLI 好像有這功能...</del>，<a href="https://github.com/vuejs/vue-cli" target="_blank" rel="external">Vue-CLI</a> 是不是也能做到。</p>
+<del>隔壁棚的 Angular CLI 好像有這功能</del>，<a href="https://github.com/vuejs/vue-cli" target="_blank" rel="external">Vue-CLI</a> 是不是也能做到。</p>
 <p>(使用 Angular 開發專案的朋友，這裏推薦參考 Will 保哥這篇文章：<a href="http://blog.miniasp.com/post/2017/02/05/Setup-proxy-to-backend-in-Angular-CLI.aspx" target="_blank" rel="external">如何在 Angular CLI 建立的 Angular 2 開發環境呼叫遠端 RESTful APIs</a>)。 </p>
-<p>別著急莫緊張，Vue-CLI 一樣也有提供類似功能喔。</p>
+<p>使用 Vue 的朋友，別著急莫緊張，Vue-CLI 也有提供類似功能喔。</p>
 <blockquote>
 <p>注意： 本文撰寫時，使用 Node v8.0.0 / NPM 5.0.0 與 yarn v0.24.6，Vue-CLI 為 2.8.2。 
 實際執行情況可能因執行環境的版本會有所差異。</p>
@@ -75,7 +75,7 @@ ga('create','UA-27126624-1','auto');ga('send','pageview');</script></head><body>
 <li><a href="https://github.com/chimurai/http-proxy-middleware#http-proxy-middleware-options" target="_blank" rel="external">https://github.com/chimurai/http-proxy-middleware#http-proxy-middleware-options</a></li>
 <li><a href="https://vuejs-templates.github.io/webpack/proxy.html" target="_blank" rel="external">https://vuejs-templates.github.io/webpack/proxy.html</a></li>
 </ul>
-</div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a data-url="https://kuro.tw/posts/2017/06/07/如何在-Vue-CLI-建立的開發環境呼叫跨域遠端-RESTful-APIs/" data-id="cj3mun40a0021v8t49z7e8heq" class="article-share-link">分享</a><div class="tags"><a href="/tags/vue-js/">vue.js</a></div><div class="post-nav"><a href="/posts/2017/05/30/VueJS-V2-在-v-for-列表完成分頁功能/" class="next">[VueJS-V2] 在 v-for 列表完成分頁功能 (從 v1 至 v2)</a></div><div id="disqus_thread"><div class="btn_click_load"><button class="disqus_click_btn">阅读评论 「请确保 disqus.com 可以正常加载」</button></div><script>var disqus_shortname = 'kurotw';
+</div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a data-url="https://kuro.tw/posts/2017/06/07/如何在-Vue-CLI-建立的開發環境呼叫跨域遠端-RESTful-APIs/" data-id="cj3muore5002261t45ipuv43h" class="article-share-link">分享</a><div class="tags"><a href="/tags/vue-js/">vue.js</a></div><div class="post-nav"><a href="/posts/2017/05/30/VueJS-V2-在-v-for-列表完成分頁功能/" class="next">[VueJS-V2] 在 v-for 列表完成分頁功能 (從 v1 至 v2)</a></div><div id="disqus_thread"><div class="btn_click_load"><button class="disqus_click_btn">阅读评论 「请确保 disqus.com 可以正常加载」</button></div><script>var disqus_shortname = 'kurotw';
 var disqus_identifier = 'posts/2017/06/07/如何在-Vue-CLI-建立的開發環境呼叫跨域遠端-RESTful-APIs/';
 var disqus_title = '如何在 Vue-CLI 建立的開發環境呼叫跨域遠端 RESTful APIs';
 var disqus_url = 'https://kuro.tw/posts/2017/06/07/如何在-Vue-CLI-建立的開發環境呼叫跨域遠端-RESTful-APIs/';

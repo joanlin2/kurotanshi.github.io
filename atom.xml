@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://kuro.tw/"/>
-  <updated>2017-06-07T10:26:17.000Z</updated>
+  <updated>2017-06-07T10:27:23.000Z</updated>
   <id>https://kuro.tw/</id>
   
   <author>
@@ -20,12 +20,12 @@
     <link href="https://kuro.tw/posts/2017/06/07/%E5%A6%82%E4%BD%95%E5%9C%A8-Vue-CLI-%E5%BB%BA%E7%AB%8B%E7%9A%84%E9%96%8B%E7%99%BC%E7%92%B0%E5%A2%83%E5%91%BC%E5%8F%AB%E8%B7%A8%E5%9F%9F%E9%81%A0%E7%AB%AF-RESTful-APIs/"/>
     <id>https://kuro.tw/posts/2017/06/07/如何在-Vue-CLI-建立的開發環境呼叫跨域遠端-RESTful-APIs/</id>
     <published>2017-06-07T10:14:00.000Z</published>
-    <updated>2017-06-07T10:26:17.000Z</updated>
+    <updated>2017-06-07T10:27:23.000Z</updated>
     
     <content type="html"><![CDATA[<p>前幾天在 VueTW 活動結束後，有朋友來問：Vue 的開發環境能不能在 local 端建立 proxy 服務來解決跨域讀取後端的 API，
-<del>隔壁棚的 Angular CLI 好像有這功能...</del>，<a href="https://github.com/vuejs/vue-cli" target="_blank" rel="external">Vue-CLI</a> 是不是也能做到。</p>
+<del>隔壁棚的 Angular CLI 好像有這功能</del>，<a href="https://github.com/vuejs/vue-cli" target="_blank" rel="external">Vue-CLI</a> 是不是也能做到。</p>
 <p>(使用 Angular 開發專案的朋友，這裏推薦參考 Will 保哥這篇文章：<a href="http://blog.miniasp.com/post/2017/02/05/Setup-proxy-to-backend-in-Angular-CLI.aspx" target="_blank" rel="external">如何在 Angular CLI 建立的 Angular 2 開發環境呼叫遠端 RESTful APIs</a>)。 </p>
-<p>別著急莫緊張，Vue-CLI 一樣也有提供類似功能喔。</p>
+<p>使用 Vue 的朋友，別著急莫緊張，Vue-CLI 也有提供類似功能喔。</p>
 <blockquote>
 <p>注意： 本文撰寫時，使用 Node v8.0.0 / NPM 5.0.0 與 yarn v0.24.6，Vue-CLI 為 2.8.2。 
 實際執行情況可能因執行環境的版本會有所差異。</p>
@@ -100,7 +100,7 @@
     <summary type="html">
     
       &lt;p&gt;前幾天在 VueTW 活動結束後，有朋友來問：Vue 的開發環境能不能在 local 端建立 proxy 服務來解決跨域讀取後端的 API，
-&lt;del&gt;隔壁棚的 Angular CLI 好像有這功能...&lt;/del&gt;，&lt;a href=&quot;https://github.com/
+&lt;del&gt;隔壁棚的 Angular CLI 好像有這功能&lt;/del&gt;，&lt;a href=&quot;https://github.com/vue
     
     </summary>
     
