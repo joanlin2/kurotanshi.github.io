@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Kuro&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="隨手寫寫，就是個人的筆記。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kuro&#39;s Blog">
+<meta property="og:url" content="https://kuro.tw/index.html">
+<meta property="og:site_name" content="Kuro&#39;s Blog">
+<meta property="og:description" content="隨手寫寫，就是個人的筆記。">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kuro&#39;s Blog">
+<meta name="twitter:description" content="隨手寫寫，就是個人的筆記。">
+  
+    <link rel="alternate" href="/atom.xml" title="Kuro&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Kuro&#39;s Blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜尋"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://kuro.tw"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-VueJS-V2-在-v-for-列表完成分頁功能" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/posts/2017/05/30/VueJS-V2-在-v-for-列表完成分頁功能/" class="article-date">
+  <time datetime="2017-05-30T09:00:00.000Z" itemprop="datePublished">2017-05-30</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/vue-js/">vue.js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/posts/2017/05/30/VueJS-V2-在-v-for-列表完成分頁功能/">[VueJS-V2] 在 v-for 列表完成分頁功能 (從 v1 至 v2)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Vue 2 都發行半年多了，直到最近有網友留言這才想起一直沒更新裡面的內容，囧。</p>
+<p>延續上回 <a href="https://kuro.tw/posts/2016/05/30/vuejs-in-v-for-through-the-filter-in-the-list-complete-search-and-page-functions/">[VueJS] 在 v-for 列表中透過 filter 完成搜尋與分頁的功能</a> 這篇的說明，
+這次我們來看看，自從 <span style="color: red">VueJS 更新到 V2 拿掉了內建的 filterBy、limitBy 等好用的 filter 後</span>，要如何修改才能做到分頁的功能。</p>
+<p>首先看到原本 V1 的範例，是這樣的，這裡透過 <code>limitBy countOfPage pageStart</code> 來完成分頁，如下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">tr</span> <span class="attr">v-for</span>=<span class="string">"r in rows </span></span></div><div class="line">  | filterBy filter_name in 'name' </div><div class="line">  | recordLength 'filteredRowCount' </div><div class="line">  | limitBy countOfPage pageStart "&gt;</div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; (currPage-1) * countOfPage + $index + 1 &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.name &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.age &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.gender &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">tr</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>因為從 V2 開始，<code>filterBy</code> 、 <code>limitBy</code> 、 <code>orderBy</code> 都沒有了，所以我們直接移除掉：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">tr</span> <span class="attr">v-for</span>=<span class="string">"r in rows"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; (currPage-1) * countOfPage + $index + 1 &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.name &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.age &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.gender &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">tr</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>這時應該會出現錯誤，因為 <code>$index</code> 的寫法也更新了，所以改一下 <code>v-for</code> 的內容：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">tr</span> <span class="attr">v-for</span>=<span class="string">"(r, index) in rows"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; (currPage-1) * countOfPage + index + 1 &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.name &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.age &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.gender &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">tr</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>到目前為止，至少可以看到程式正常運作，但相對地<span style="color: red">分頁與搜尋的功能也沒了</span>，所以接下來先來處理<strong>搜尋</strong>的部份。</p>
+<hr>
+
+<p>首先，在 <code>computed</code> 屬性，我們新增一個叫做 <code>filteredRows</code> 的屬性，用來處理與 <code>filter_name</code> 比對後的結果：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">filteredRows: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">  <span class="comment">// 因為 JavaScript 的 filter 有分大小寫，</span></div><div class="line">  <span class="comment">// 所以這裡將 filter_name 與 rows[n].name 通通轉小寫方便比對。</span></div><div class="line">  <span class="keyword">var</span> filter_name = <span class="keyword">this</span>.filter_name.toLowerCase();</div><div class="line">  </div><div class="line">  <span class="comment">// 如果 filter_name 有內容，回傳過濾後的資料，否則將原本的 rows 回傳。</span></div><div class="line">  <span class="keyword">return</span> ( <span class="keyword">this</span>.filter_name.trim() !== <span class="string">''</span> ) ? </div><div class="line">      <span class="keyword">this</span>.rows.filter(<span class="function"><span class="keyword">function</span>(<span class="params">d</span>)</span>&#123; <span class="keyword">return</span> d.name.toLowerCase().indexOf(filter_name) &gt; <span class="number">-1</span>; &#125;) : </div><div class="line">      <span class="keyword">this</span>.rows;</div><div class="line">&#125;,</div></pre></td></tr></table></figure>
+<p>然後將 html 內的 <code>rows</code> 換成 <code>filteredRows</code></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">tr</span> <span class="attr">v-for</span>=<span class="string">"(r, index) in filteredRows"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; (currPage-1) * countOfPage + index + 1 &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.name &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.age &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.gender &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">tr</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>name 搜尋的部份到這裡就算完成了，接著回頭來處理<strong>分頁</strong>。</p>
+<hr>
+
+<p>處理分頁之前，先看到底下的分頁按鈕， <code>n in range</code> 在 V2 的寫法也有不同，原本的索引會由 0 開始，但從 V2 開始會由 1 開始，所以需要把原本的：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"pagination"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">ul</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-bind:class</span>=<span class="string">"&#123;'disabled': (currPage === 1)&#125;"</span> </span></div><div class="line">        @<span class="attr">click.prevent</span>=<span class="string">"setPage(currPage-1)"</span>&gt;<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span>&gt;</span>Prev<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-for</span>=<span class="string">"n in totalPage"</span></span></div><div class="line">        <span class="attr">v-bind:class</span>=<span class="string">"&#123;'active': (currPage === (n+1))&#125;"</span> </div><div class="line">        @<span class="attr">click.prevent</span>=<span class="string">"setPage(n+1)"</span>&gt;<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span>&gt;</span>&#123;&#123;n+1&#125;&#125;<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-bind:class</span>=<span class="string">"&#123;'disabled': (currPage === totalPage)&#125;"</span> </span></div><div class="line">        @<span class="attr">click.prevent</span>=<span class="string">"setPage(currPage+1)"</span>&gt;<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span>&gt;</span>Next<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>改寫成：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"pagination"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">ul</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-bind:class</span>=<span class="string">"&#123;'disabled': (currPage === 1)&#125;"</span> </span></div><div class="line">        @<span class="attr">click.prevent</span>=<span class="string">"setPage(currPage-1)"</span>&gt;<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span>&gt;</span>Prev<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-for</span>=<span class="string">"n in totalPage"</span></span></div><div class="line">        <span class="attr">v-bind:class</span>=<span class="string">"&#123;'active': (currPage === (n))&#125;"</span> </div><div class="line">        @<span class="attr">click.prevent</span>=<span class="string">"setPage(n)"</span>&gt;<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span>&gt;</span>&#123;&#123;n&#125;&#125;<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-bind:class</span>=<span class="string">"&#123;'disabled': (currPage === totalPage)&#125;"</span> </span></div><div class="line">        @<span class="attr">click.prevent</span>=<span class="string">"setPage(currPage+1)"</span>&gt;<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span>&gt;</span>Next<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>顯示就會是正常的從 1 開始了。</p>
+<p>再來處理顯示筆數時，需要的會有 <code>pageStart</code> 、 <code>countOfPage</code> 與 <code>totalPage</code> 這三個部分，其中 <code>totalPage</code> 會跟先前提到的 <strong>搜尋</strong> 比較有關係，因為總頁數不對，算出來的分頁也會有問題。</p>
+<p>原本的 <code>totalPage</code> 長這樣：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">totalPage: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">  <span class="keyword">if</span>( <span class="keyword">this</span>.filter_name.trim() === <span class="string">''</span> ) &#123;</div><div class="line">      <span class="keyword">return</span> <span class="built_in">Math</span>.ceil(<span class="keyword">this</span>.rows.length / <span class="keyword">this</span>.countOfPage);</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">else</span>&#123;</div><div class="line">      <span class="keyword">return</span> <span class="built_in">Math</span>.ceil(<span class="keyword">this</span>.filteredRowCount / <span class="keyword">this</span>.countOfPage);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>因為資料在先前都交給 <code>filteredRows</code> 處理了，所以可以改寫成
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">totalPage: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">  <span class="keyword">return</span> <span class="built_in">Math</span>.ceil(<span class="keyword">this</span>.filteredRows.length / <span class="keyword">this</span>.countOfPage);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>實際執行會發現最底下的分頁按鈕已經會隨著 Filter 的結果筆數而有所不同：</p>
+<p><img src="/static/img/v2-filter-1.png"></p>
+<p><hr>
+<img src="/static/img/v2-filter-2.png"></p>
+<p>最後，再回到處理<span style="color: red">每頁顯示資料量</span>的部分。</p>
+<p>在沒有了 <code>limitBy</code> 之後，顯示筆數的部份我們可以透過 JavaScript 的 <code>slice</code> 來處理，當然也可以寫在 <code>computed</code> 屬性。
+但這個範例只是單純在顯示作切換，所以可以直接寫在 view 上，像這樣將 <code>filteredRows</code> 改寫成 <code>filteredRows.slice(pageStart, pageStart + countOfPage)</code>：</p>
+<p>對 <code>slice</code> 不熟的朋友可參考： MDN: <a href="https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array/slice" target="_blank" rel="external">Array.prototype.slice()</a></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">tr</span> <span class="attr">v-for</span>=<span class="string">"(r, index) in filteredRows.slice(pageStart, pageStart + countOfPage)"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; (currPage-1) * countOfPage + index + 1 &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.name &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.age &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; r.gender &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">tr</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>就完成了從 V1 更新到 V2 的過程了。</p>
+<p>完整更新的範例可在此參考：<br>
+<a class="jsbin-embed" href="http://jsbin.com/kusafiqaka/embed?html,js,output" target="_blank" rel="external">JS Bin on jsbin.com</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://kuro.tw/posts/2017/05/30/VueJS-V2-在-v-for-列表完成分頁功能/" data-id="cj3mjzsaa0001tut4ffzujo36" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue-js/">vue.js</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-筆記-Google-街景-API-加入圖標與角度計算" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/posts/2017/04/04/筆記-Google-街景-API-加入圖標與角度計算/" class="article-date">
+  <time datetime="2017-04-04T07:10:00.000Z" itemprop="datePublished">2017-04-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Google-Map/">Google Map</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/posts/2017/04/04/筆記-Google-街景-API-加入圖標與角度計算/">[筆記] Google 街景 API 加入圖標與預設角度計算</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>相信大家都知道 Google Map 在多年以前就開放了「街景檢視」這樣的服務，當然 Google Map API 也提供了給開發者使用相關的 API 服務：「<a target="_blank" href="https://developers.google.com/maps/documentation/javascript/streetview">Street View Service</a>」來開發地圖的應用。</p>
+<p>除了原本在 Google Map 上面就有的街景檢視之外，透過 Street View API 開發者可以自由地在街景地圖上加入標示項，作法就跟平時在地圖上加入 marker 一樣：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> marker = <span class="keyword">new</span> google.maps.Marker(&#123;</div><div class="line">  <span class="attr">map</span>: map,</div><div class="line">  <span class="attr">icon</span>: <span class="string">'//chart.googleapis.com/chart?chst=d_map_pin_icon&amp;chld=train|ffff00'</span>,</div><div class="line">  <span class="attr">position</span>: &#123;<span class="attr">lat</span>: <span class="number">25.051269</span>, <span class="attr">lng</span>: <span class="number">121.512386</span>&#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>如下圖黃色 icon：
+<img src="/static/img/map-marker.png"></p>
+<p>這個時候我們切換成街景檢視的時候，你會發現還需要自己手動調整角度才能找到 icon 的位置：
+<br>(如下地圖，可按右下角按鈕切換街景)</p>
+<iframe style="border: 1px solid #aaa; width: 720px; height: 300px;" src="https://kuro.tw/demo-pages/maps/map-add-marker.html"></iframe>
+
+<p>需要將視角往左邊移動後才能找到 icon 的位置。</p>
+<hr>
+
+<p>那麼，是否有更好的方式可以讓 Google 街景可以自動判斷視角方向呢？</p>
+<p>有的，可以利用 Google Map 所提供的 <a target="_blank" href="https://developers.google.com/maps/documentation/javascript/geometry">Geometry Library</a> 來協助我們計算兩點之間的角度。</p>
+<p>在 Google Maps API 內，「方向」是以與正北的角度來定義，也就是從正北 (0 度) 的順時針方向計算的角度，可以使用 <code>computeHeading()</code> 方法，將兩個 <code>from</code> 和 <code>to</code> 的 LatLng 物件傳遞給它，來計算兩個位置之間的方向。</p>
+<p>如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> heading = google.maps.geometry.spherical.computeHeading(from_latLng, target_latlng);</div></pre></td></tr></table></figure>
+<p><code>google.maps.geometry.spherical.computeHeading( )</code> 就會回傳兩點之間的角度，接著，我們就可以透過
+<code>panorama.setPov({ heading: heading, pitch: 0 });</code> 來指定街景的預設角度了。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://kuro.tw/posts/2017/04/04/筆記-Google-街景-API-加入圖標與角度計算/" data-id="cj3mjzsbr0021tut494xthjb5" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/google-map/">google map</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/street-map-api/">street map api</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-透過-VueCLI-建置專案時，自動切換-devtools-的-debug-環境" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/posts/2016/12/08/透過-VueCLI-建置專案時，自動切換-devtools-的-debug-環境/" class="article-date">
+  <time datetime="2016-12-08T03:40:00.000Z" itemprop="datePublished">2016-12-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/vue-js/">vue.js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/posts/2016/12/08/透過-VueCLI-建置專案時，自動切換-devtools-的-debug-環境/">透過 Vue-CLI 建置專案時，自動切換 devtools 的 debug 環境</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Vue 提供了相當好用的 debug 工具 (Chrome 套件)， <a href="https://chrome.google.com/webstore/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd" target="_blank" rel="external">Vue.js devtools</a>，在安裝之後當你用 Chrome 開啟 Vue 專案時，Chrome 的開發者工具會多出一個 Vue 的 Tab，然後把 Vue Instance 裡的屬性通通列出來：</p>
+<p><img src="/static/img/vue-tool-screenshot.png"></p>
+<p>在預設開啟 debug mode 時，按下 Vue devtools 的 icon 你會看到這樣畫面：
+<img src="/static/img/vue-tool-on.png"></p>
+<p>這時候打開 Chrome 開發者工具， vue 專案中所有 Instance 的屬性資料通通一覽無遺。</p>
+<hr>
+
+<p>但是當專案完成要上線的時候，就應該要將 debug mode 關閉，尤其在屬性可能會存有較為機敏性資料的時候。
+關閉的方式也很簡單，加上這兩行就可以了：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Vue.config.debug = <span class="literal">false</span>;</div><div class="line">Vue.config.devtools = <span class="literal">false</span>;</div></pre></td></tr></table></figure>
+<p>關閉後，再開啟 Vue 專案，雖然 icon 偵測到 Vue.js 會亮起來，但是你會看到這樣訊息：
+<img src="/static/img/vue-tool-disabled.png"></p>
+<p>這時候 Chrome 開發者工具的 Vue tab 就不會出現了。</p>
+<hr>
+
+<p>但是，在建置專案的時候，常常會忘記手動調整 debug mode，導致上線的專案會是開啟 debug mode 的版本，
+是否可以在 webpack 啟動的時候自動判斷目前環境呢？</p>
+<p>以 Vue-CLI 提供的 package.json 為例，他提供了兩個預設的 scripts， dev 用在開發專案時使用，而 build 則用於建置 production 使用：
+<img src="/static/img/vue-package-json.png"></p>
+<p>圖中可以看到，在 build 模式下多了 <code>NODE_ENV=production</code> 這個參數。</p>
+<p>這時候我們就可以利用 <code>NODE_ENV</code> 這個參數來判斷使否開啟 debug mode：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">'vue'</span></div><div class="line"><span class="keyword">import</span> App <span class="keyword">from</span> <span class="string">'./App.vue'</span></div><div class="line"></div><div class="line"><span class="keyword">const</span> isDebug_mode = process.env.NODE_ENV !== <span class="string">'production'</span>;</div><div class="line"></div><div class="line">Vue.config.debug = isDebug_mode;</div><div class="line">Vue.config.devtools = isDebug_mode;</div></pre></td></tr></table></figure>
+<p>這樣 <code>Vue.config.debug</code> 的版本就會自動依照執行階段的不同而有不同的設定了。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://kuro.tw/posts/2016/12/08/透過-VueCLI-建置專案時，自動切換-devtools-的-debug-環境/" data-id="cj3mjzsbv0029tut4d91ud18t" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/devtools/">devtools</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue-js/">vue.js</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/webpack/">webpack</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-利用-yarn-安裝-vue-cli" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/posts/2016/10/13/利用-yarn-安裝-vue-cli/" class="article-date">
+  <time datetime="2016-10-13T03:49:07.000Z" itemprop="datePublished">2016-10-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/vue-js/">vue.js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/posts/2016/10/13/利用-yarn-安裝-vue-cli/">利用 Yarn 安裝 Vue-cli</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>這兩天 JavaScript 圈子的最大新聞應該就是 Facebook 發布了一套新的 JavaScript 套件管理工具 Yarn，感覺來勢洶洶勢不可擋。
+實際花了一點時間試用，表現的確也比過去 npm 好很多，尤其過去 <code>npm install</code> 速度過慢，套件相依衝突的問題，目前在 Yarn 還沒遇到。 即使是剛開始 <code>yarn run scripts</code> 無法帶入參數的問題，在發布的第二天也快速地更新 (v0.15.1) 解決了。 👍</p>
+<p><img src="/static/img/yarn-logo.png"></p>
+<p>有關 Yarn 介紹的部分，已經有其他前輩分享了，推薦可以看看這篇 <a href="https://medium.com/@jackypan1989/%E5%8F%96%E4%BB%A3-npm-%E7%9A%84%E6%96%B0%E5%88%A9%E5%99%A8-yarn-7d97f2f409b9#.pu0jrdcc4" target="_blank" rel="external">取代 npm 的新利器 Yarn</a>。</p>
+<p>既然 Yarn 號稱可以用來取代 npm，那麼身為 Vue 的愛好者，也想馬上來試試 <a href="https://github.com/vuejs/vue-cli" target="_blank" rel="external">Vue-cli</a> 這套 Vue 的樣板工具包是否也可以透過 yarn 來單獨執行。</p>
+<p><del>既然要取代 npm，那麼第一件事情就是把 npm 整包幹掉</del>，關於刪掉 npm modules 的過程我是參考 stackoverflow 的這篇:
+<a href="http://stackoverflow.com/questions/9283472/command-to-remove-all-npm-modules-globally" target="_blank" rel="external">Command to remove all npm modules globally?</a>，但實際上 Yarn 與 npm 是可以和平共存的，不一定要把 npm 幹掉才能跑 Yarn ，這裡只是想簡單做個試驗，啾咪 ^.&lt;</p>
+<p>然後安裝 Yarn。 執行 <code>curl -o- -L https://yarnpkg.com/install.sh | bash</code> 即可。</p>
+<hr>
+
+<h3 id="第一步：安裝-vue-cli"><a href="#第一步：安裝-vue-cli" class="headerlink" title="第一步：安裝 vue-cli"></a>第一步：安裝 vue-cli</h3><p>很簡單，把原本的  <code>npm install -g vue-cli</code> 改成 <code>yarn global add vue-cli</code> 就可以了。執行的時候像這樣：
+<img src="/static/img/yarn-vue-1.png"></p>
+<p>而安裝完畢後，執行 <code>yarn vue</code> 應該可以看到這樣的畫面。
+<img src="/static/img/yarn-vue-2.png"></p>
+<p>每執行完一個指令還會告訴你它跑了多久喔<del>，非常囂張 (誤)</del>。</p>
+<h3 id="第二步：初始化-Vue-專案"><a href="#第二步：初始化-Vue-專案" class="headerlink" title="第二步：初始化 Vue 專案"></a>第二步：初始化 Vue 專案</h3><p>接著，就來初始化我們的 Vue 專案。 Vue-cli 這個 scaffolding 工具官方目前提供了幾種 template 讓開發者自行選擇，
+像是大家常見的 webpack、browserify 都有。當然也可以挑選什麼都沒有的 simple: 就是最基本的 Vue 專案這樣。
+如果想更詳細了解各種 template 細節的話，可以到 vue-templates 的 <a href="https://github.com/vuejs-templates" target="_blank" rel="external">Repo</a> 去看。</p>
+<p>這裡我就選擇拿「<a href="https://github.com/vuejs-templates/webpack-simple" target="_blank" rel="external">webpack-simple</a>」當範例。</p>
+<p>執行 <code>yarn vue init webpack-simple my-project</code>
+<img src="/static/img/yarn-vue-3.png"></p>
+<p>因為 VueJS 目前已經發佈至 2.0 版了，所以你會看到 Vue-cli 很貼心地提醒你現在安裝的是<span style="color: red;"> 2.0 的版本</span>。
+若你想安裝的是 1.x 版本的話，可以改成 <br> <code>yarn vue init webpack-simple#1.0 my-project</code> 即可。</p>
+<p>然後，Vue-cli 會幫我們建立一個新目錄 <code>my-project</code>。</p>
+<p>透過 <code>cd my-project</code> 切換到新專案目錄後，我們將原本的 <code>npm install</code> 改成直接執行 <code>yarn</code> 即可。
+<img src="/static/img/yarn-vue-4.png"></p>
+<h3 id="第三步：啟動並執行-vue-專案"><a href="#第三步：啟動並執行-vue-專案" class="headerlink" title="第三步：啟動並執行 vue 專案"></a>第三步：啟動並執行 vue 專案</h3><p>最後，直接執行 <code>yarn run dev</code> 應該會看到像這樣的畫面。
+<img src="/static/img/yarn-vue-5.png"></p>
+<p>打開你的瀏覽器連到 <code>http://localhost:8080/</code> 看到 <code>Hello Vue!</code> 的字樣就代表成功執行囉！
+<img src="/static/img/yarn-vue-6.png"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://kuro.tw/posts/2016/10/13/利用-yarn-安裝-vue-cli/" data-id="cj3mjzsbq001ztut4omngug74" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue-js/">vue.js</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-筆記-透過-Composition-Events-增強非拉丁語系輸入法對輸入框的支援" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/posts/2016/10/11/筆記-透過-Composition-Events-增強非拉丁語系輸入法對輸入框的支援/" class="article-date">
+  <time datetime="2016-10-11T04:57:30.000Z" itemprop="datePublished">2016-10-11</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/HTML/">HTML</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/posts/2016/10/11/筆記-透過-Composition-Events-增強非拉丁語系輸入法對輸入框的支援/">[筆記] 透過 Composition Events 增強非拉丁語系輸入法對輸入框的支援</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近在爬 Vue 的原始碼的時候，意外發現兩個沒看過的 event：<code>compositionstart</code> 與 <code>compositionend</code>。 查了一下 MDN 才發現這些叫做「<a href="https://developer.mozilla.org/en-US/docs/Web/API/CompositionEvent" title="Composition Events" target="_blank" rel="external">Composition Events</a>」的 event 是從 DOM Level 3 之後才新增的。</p>
+<p>介紹 Composition Events 之前先來談談 DOM API 過去對輸入框偵測變化的幾個方式。</p>
+<p>一般來說，常見的表單輸入框如: <code>&lt;input type=&quot;text&quot;&gt;</code> 如果要動態監聽輸入框的文字變化時，
+大多會透過監聽 <code>keydown</code>、<code>keypress</code>、<code>keyup</code> 等鍵盤事件來判斷 value 是否變動，但如果是透過複製貼上之類的操作，就無法透過鍵盤事件來判斷。</p>
+<p>而即使是 <code>change</code> 事件則是要在使用者改變內容，且<span style="color: red;">焦點離開輸入框的前一刻才會被觸發</span>。
+所以後來有了 <code>input</code> 事件， input 事件會在<span style="color: red;">輸入框的內容被改變時即時觸發</span>，確實也解決了過去在 onChange 以及鍵盤相關事件帶來的不少問題。</p>
+<p>新的問題來了！</p>
+<p>通常像這樣的搜尋框，我們會用類似 autocomplete 的方式給使用者搜尋建議 (以 google 為例)：
+<img src="/static/img/google-autocompleted.png"></p>
+<p>如上圖，在輸入中文的時候，通常會需要透過注音之類的輸入法來做拼字，但是在大部分的情況下，自動給「注音符號」或是「拼音文字」搜尋建議是沒有太大意義的。</p>
+<p>回到主題。這個時候就需要透過 <strong>Composition Events</strong> 來為輸入框做增強。
+透過 Composition Events 我們可以觀察使用者在輸入框內開啟輸入法 (Input Method Editor, IME) 時，組字或選字的狀態。</p>
+<p>Composition Events 提供三個事件給開發者監聽：分別是 <code>compositionstart</code> 、 <code>compositionend</code> ，以及 <code>compositionupdate</code>。</p>
+<ul>
+<li><code>compositionstart</code>: 輸入框內開啟輸入法，且正在拼字時觸發。</li>
+<li><code>compositionupdate</code>:輸入框內開啟輸入法，且正在拼字或選字時更改了內容時觸發。</li>
+<li><code>compositionend</code>: 輸入框內開啟輸入法，拼字或選字完成，正要送出至輸入框時觸發。</li>
+</ul>
+<p></p><p></p>
+執行的時候像這樣：
+<img src="/static/img/composition-demo.png"><p></p>
+<p>可以看到，如果要確認使用者輸入完成並送出文字時，可以透過 <code>compositionend</code> 來做最後確認。<br>
+附上 JSBin Demo: <a href="http://jsbin.com/mofepimiqo/1/edit?js,console,output" target="_blank" rel="external">http://jsbin.com/mofepimiqo/1/edit?js,console,output</a></p>
+<p>最後則是大家都很關心的瀏覽器支援度。以目前來說，mobile 平台上可能還不太 ok，但是 Desktop 平台上表現看起來相當不錯，可以大膽地使用囉。
+<img src="/static/img/compositionEvent-compatibility.png"></p>
+<p></p><p class="no-space" style="margin-bottom:0">參考資料：</p><p></p>
+<ul>
+<li><a href="http://blog.zhusee.in/post/146553/enhance-ime-support-of-codemirror-with-composition-events" target="_blank" rel="external">用 Composition Event 改進 CodeMirror 對輸入法的支援</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/CompositionEvent" title="Composition Events" target="_blank" rel="external">MDN: Composition Events</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://kuro.tw/posts/2016/10/11/筆記-透過-Composition-Events-增強非拉丁語系輸入法對輸入框的支援/" data-id="cj3mjzsbt0026tut4ed1i95gl" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/events/">events</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/html/">html</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/javascript/">javascript</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-VueJS-各種資料綁定-data-binding-的方式" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/posts/2016/10/05/VueJS-各種資料綁定-data-binding-的方式/" class="article-date">
+  <time datetime="2016-10-05T01:04:34.000Z" itemprop="datePublished">2016-10-05</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/vue-js/">vue.js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/posts/2016/10/05/VueJS-各種資料綁定-data-binding-的方式/">VueJS 各種資料綁定 (data binding) 的方式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>大部分資料是從這裡來的: <a href="https://github.com/vuejs/vue/wiki/1.0.0-binding-syntax-cheatsheet" target="_blank" rel="external">Vue 1.0.0 binding syntax cheatsheet</a>，再加上對 Vue 2.0 補充的部分。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- normal directive --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">v-if</span>=<span class="string">"ok"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- directive with argument --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">v-on:click</span>=<span class="string">"onClick"</span>&gt;</span><span class="tag">&lt;/<span class="name">button</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- v-on with argument + key modifier --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">v-on:keyup.enter</span>=<span class="string">"handleEnter"</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- literal modifier: pass literal string to directive for Vue 1.x, --&gt;</span></div><div class="line"><span class="comment">&lt;!-- but deprecated in 2.0 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">v-link.literal</span>=<span class="string">"/a/b/c"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- binding an attribute with v-bind --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">v-bind:src</span>=<span class="string">"imgSrc"</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">v-bind:href</span>=<span class="string">"baseURL + '/path'"</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- shorthand: colon for v-bind --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">:src</span>=<span class="string">"imgSrc"</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">:href</span>=<span class="string">"baseURL + '/path'"</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- shorthand: @ for v-on --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">button</span> @<span class="attr">click</span>=<span class="string">"onClick"</span>&gt;</span><span class="tag">&lt;/<span class="name">button</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- key modifier --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">input</span> @<span class="attr">keyup.enter</span>=<span class="string">"handleEnter"</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- stop/prevent modifier --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">button</span> @<span class="attr">click.stop</span>=<span class="string">"onClick"</span>&gt;</span><span class="tag">&lt;/<span class="name">button</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">form</span> @<span class="attr">submit.prevent</span>&gt;</span><span class="tag">&lt;/<span class="name">form</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- props for Vue 1.x --&gt;</span></div><div class="line"><span class="comment">&lt;!-- .once and .sync are deprecated in 2.0 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">my-comp</span></span></div><div class="line">  <span class="attr">prop</span>=<span class="string">"literal string"</span></div><div class="line">  <span class="attr">v-bind:prop</span>=<span class="string">"defaultOneWay"</span></div><div class="line">  <span class="attr">v-bind:prop.sync</span>=<span class="string">"twoWay"</span></div><div class="line">  <span class="attr">v-bind:prop.once</span>=<span class="string">"oneTime"</span>&gt;</div><div class="line"><span class="tag">&lt;/<span class="name">my-comp</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- props with one time binding for Vue 2.0 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">my-comp</span></span></div><div class="line">  <span class="attr">prop</span>=<span class="string">"literal string"</span></div><div class="line">  <span class="attr">v-bind:prop</span>=<span class="string">"defaultOneWay"</span></div><div class="line">  <span class="attr">v-once</span>&gt;</div><div class="line"><span class="tag">&lt;/<span class="name">my-comp</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- component with props and custom events, in shorthand --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">item-list</span></span></div><div class="line">  <span class="attr">:items</span>=<span class="string">"items"</span></div><div class="line">  <span class="attr">:open.sync</span>=<span class="string">"isListOpen"</span></div><div class="line">  @<span class="attr">ready</span>=<span class="string">"onItemsReady"</span></div><div class="line">  @<span class="attr">update</span>=<span class="string">"onItemsUpdate"</span>&gt;</div><div class="line"><span class="tag">&lt;/<span class="name">item-list</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- v-el and v-ref now just use the argument --&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- registers vm.$refs.child for Vue 1.x --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">comp</span> <span class="attr">v-ref:child</span>&gt;</span><span class="tag">&lt;/<span class="name">comp</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- registers vm.$refs.child for Vue 2.0 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">comp</span> <span class="attr">ref:child</span>&gt;</span><span class="tag">&lt;/<span class="name">comp</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- registers vm.$els.node for Vue 1.x, but deprecated in 2.0 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">v-el:node</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://kuro.tw/posts/2016/10/05/VueJS-各種資料綁定-data-binding-的方式/" data-id="cj3mjzsag0005tut4uavrwcqc" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue-js/">vue.js</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+  <nav id="page-nav">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/">__('next') &raquo;</a>
+  </nav>
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分類</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/D3-js/">D3.js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/ECMAScript/">ECMAScript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/GIS/">GIS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/GeoJSON/">GeoJSON</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Google-Map/">Google Map</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/HTML/">HTML</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/ModernWebConf/">ModernWebConf</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/OpenData/">OpenData</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/android/">android</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue-js/">vue.js</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">標籤</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/D3-js/">D3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Fusion-Table/">Fusion Table</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GeoJSON/">GeoJSON</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Geocoder/">Geocoder</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Heatmap/">Heatmap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/d3-js/">d3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/devtools/">devtools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/donut-chart/">donut chart</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ecmascript/">ecmascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/events/">events</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gis/">gis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/google-map/">google map</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html5/">html5</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/infoWindow/">infoWindow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jQuery/">jQuery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mobile/">mobile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/opendata/">opendata</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rwd/">rwd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/street-map-api/">street map api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/twd97/">twd97</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue-js/">vue.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">標籤雲</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/D3-js/" style="font-size: 12px;">D3.js</a> <a href="/tags/Fusion-Table/" style="font-size: 10px;">Fusion Table</a> <a href="/tags/GeoJSON/" style="font-size: 10px;">GeoJSON</a> <a href="/tags/Geocoder/" style="font-size: 10px;">Geocoder</a> <a href="/tags/Heatmap/" style="font-size: 10px;">Heatmap</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/chrome/" style="font-size: 10px;">chrome</a> <a href="/tags/d3-js/" style="font-size: 16px;">d3.js</a> <a href="/tags/devtools/" style="font-size: 10px;">devtools</a> <a href="/tags/donut-chart/" style="font-size: 10px;">donut chart</a> <a href="/tags/ecmascript/" style="font-size: 10px;">ecmascript</a> <a href="/tags/events/" style="font-size: 10px;">events</a> <a href="/tags/gis/" style="font-size: 10px;">gis</a> <a href="/tags/google-map/" style="font-size: 20px;">google map</a> <a href="/tags/html/" style="font-size: 12px;">html</a> <a href="/tags/html5/" style="font-size: 10px;">html5</a> <a href="/tags/infoWindow/" style="font-size: 10px;">infoWindow</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/javascript/" style="font-size: 14px;">javascript</a> <a href="/tags/mobile/" style="font-size: 10px;">mobile</a> <a href="/tags/opendata/" style="font-size: 14px;">opendata</a> <a href="/tags/php/" style="font-size: 10px;">php</a> <a href="/tags/rwd/" style="font-size: 10px;">rwd</a> <a href="/tags/street-map-api/" style="font-size: 10px;">street map api</a> <a href="/tags/twd97/" style="font-size: 10px;">twd97</a> <a href="/tags/vue-js/" style="font-size: 18px;">vue.js</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">彙整</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">五月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">十月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">九月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">五月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">四月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">八月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">十一月 2011</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/posts/2017/05/30/VueJS-V2-在-v-for-列表完成分頁功能/">[VueJS-V2] 在 v-for 列表完成分頁功能 (從 v1 至 v2)</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2017/04/04/筆記-Google-街景-API-加入圖標與角度計算/">[筆記] Google 街景 API 加入圖標與預設角度計算</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2016/12/08/透過-VueCLI-建置專案時，自動切換-devtools-的-debug-環境/">透過 Vue-CLI 建置專案時，自動切換 devtools 的 debug 環境</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2016/10/13/利用-yarn-安裝-vue-cli/">利用 Yarn 安裝 Vue-cli</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2016/10/11/筆記-透過-Composition-Events-增強非拉丁語系輸入法對輸入框的支援/">[筆記] 透過 Composition Events 增強非拉丁語系輸入法對輸入框的支援</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Kuro Hsu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

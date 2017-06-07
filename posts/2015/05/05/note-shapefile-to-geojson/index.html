@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>[筆記] Shapefile to GeoJSON | Kuro&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="因為每次轉檔都要查，索性把步驟記錄下來。 首先要安裝 GDAL (Geospatial Data Abstraction Library) 這個程式， 因為我是用 Mac ，所以在 terminal 輸入 brew install gdal 就可以了。 其他作業系統的安裝方式可詳閱 http://www.gdal.org/ 。 安裝好 gdal 之後，就可以透過 ogr2ogr 來執行轉檔，一樣在">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[筆記] Shapefile to GeoJSON">
+<meta property="og:url" content="https://kuro.tw/posts/2015/05/05/note-shapefile-to-geojson/index.html">
+<meta property="og:site_name" content="Kuro&#39;s Blog">
+<meta property="og:description" content="因為每次轉檔都要查，索性把步驟記錄下來。 首先要安裝 GDAL (Geospatial Data Abstraction Library) 這個程式， 因為我是用 Mac ，所以在 terminal 輸入 brew install gdal 就可以了。 其他作業系統的安裝方式可詳閱 http://www.gdal.org/ 。 安裝好 gdal 之後，就可以透過 ogr2ogr 來執行轉檔，一樣在">
+<meta property="og:image" content="http://user-image.logdown.io/user/3292/blog/3340/post/263637/UrqBEFSmTuazvdty255S_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-05-05%20%E4%B8%8B%E5%8D%883.47.07.png">
+<meta property="og:updated_time" content="2017-06-07T05:16:03.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[筆記] Shapefile to GeoJSON">
+<meta name="twitter:description" content="因為每次轉檔都要查，索性把步驟記錄下來。 首先要安裝 GDAL (Geospatial Data Abstraction Library) 這個程式， 因為我是用 Mac ，所以在 terminal 輸入 brew install gdal 就可以了。 其他作業系統的安裝方式可詳閱 http://www.gdal.org/ 。 安裝好 gdal 之後，就可以透過 ogr2ogr 來執行轉檔，一樣在">
+<meta name="twitter:image" content="http://user-image.logdown.io/user/3292/blog/3340/post/263637/UrqBEFSmTuazvdty255S_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-05-05%20%E4%B8%8B%E5%8D%883.47.07.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Kuro&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Kuro&#39;s Blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜尋"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://kuro.tw"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-note-shapefile-to-geojson" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/posts/2015/05/05/note-shapefile-to-geojson/" class="article-date">
+  <time datetime="2015-05-04T22:45:00.000Z" itemprop="datePublished">2015-05-05</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/GeoJSON/">GeoJSON</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      [筆記] Shapefile to GeoJSON
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>因為每次轉檔都要查，索性把步驟記錄下來。</p>
+<p>首先要安裝 GDAL (Geospatial Data Abstraction Library) 這個程式，
+因為我是用 Mac ，所以在 terminal 輸入 <code>brew install gdal</code> 就可以了。</p>
+<p>其他作業系統的安裝方式可詳閱 <a href="http://www.gdal.org/" target="_blank" rel="external">http://www.gdal.org/</a> 。</p>
+<p>安裝好 gdal 之後，就可以透過 ogr2ogr 來執行轉檔，一樣在 terminal 輸入：</p>
+<p><code>ogr2ogr -f &quot;GeoJSON&quot; output.json source.shp</code></p>
+<p>以臺北市政府開放資料的<strong>臺北市區界圖</strong> ( <a href="http://data.taipei/opendata/datalist/datasetMeta?oid=1601ef3a-c253-4988-b047-943d9e786143" target="_blank" rel="external">http://data.taipei/opendata/datalist/datasetMeta?oid=1601ef3a-c253-4988-b047-943d9e786143</a> ) 提供的 Shapefile 來說，因為它的坐標系統是 EPSG:3826(TWD97/121分帶)，我們需要把它轉換成 WGS84經緯度(EPSG:4326)，所以透過 <code>-s_srs</code> 與 <code>-t_srs</code> 來分別指定轉換前與轉換後的座標系統：</p>
+<p><code>ogr2ogr -f &quot;GeoJSON&quot; -s_srs EPSG:3826 -t_srs EPSG:4326  output.json source.shp</code></p>
+<p>轉換後的 geojson 直接輸出到 google map 上：
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/263637/UrqBEFSmTuazvdty255S_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-05-05%20%E4%B8%8B%E5%8D%883.47.07.png" alt="螢幕快照 2015-05-05 下午3.47.07.png"></p>
+<p>就這樣。</p>
+<p>[補充]
+關於 GeoJson 送到 Google Map 的部分可以參考我的其他文章：
+<a href="http://kuro.tw/posts/2015/04/28/through-the-google-maps-api-geojson-data" title="透過 Google Maps API 處理 GeoJSON 資料">透過 Google Maps API 處理 GeoJSON 資料</a>
+<a href="http://kuro.tw/posts/2015/09/30/use-google-map-view-rainfall-simulation-of-flooding-in-taipei-city-map" title="利用 Google Map 檢視台北市降雨淹水模擬圖">利用 Google Map 檢視台北市降雨淹水模擬圖</a></p>
+<p>又，如果需要轉換成 TopoJSON 的話，也可以參考這篇： <a href="http://blog.infographics.tw/2015/04/visualize-geographics-with-d3js/" title="視覺化實戰 － D3.js 地理區塊視覺化" target="_blank" rel="external">視覺化實戰 － D3.js 地理區塊視覺化</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://kuro.tw/posts/2015/05/05/note-shapefile-to-geojson/" data-id="cj3mjzsb90015tut4sms2068u" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/posts/2015/05/11/note-blocking-android-chrome-page-drop-down-automatically-restructure-page/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          [筆記] 阻擋 android chrome 網頁下拉自動重整頁面
+        
+      </div>
+    </a>
+  
+  
+    <a href="/posts/2015/05/04/snippet-d3js-donuts-chart-the-transition-effect/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">[snippet] D3.js 甜甜圈圖 (donut chart) 的放大漸變效果</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分類</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/D3-js/">D3.js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/ECMAScript/">ECMAScript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/GIS/">GIS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/GeoJSON/">GeoJSON</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Google-Map/">Google Map</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/HTML/">HTML</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/ModernWebConf/">ModernWebConf</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/OpenData/">OpenData</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/android/">android</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue-js/">vue.js</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">標籤</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/D3-js/">D3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Fusion-Table/">Fusion Table</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GeoJSON/">GeoJSON</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Geocoder/">Geocoder</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Heatmap/">Heatmap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/d3-js/">d3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/devtools/">devtools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/donut-chart/">donut chart</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ecmascript/">ecmascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/events/">events</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gis/">gis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/google-map/">google map</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html5/">html5</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/infoWindow/">infoWindow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jQuery/">jQuery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mobile/">mobile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/opendata/">opendata</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rwd/">rwd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/street-map-api/">street map api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/twd97/">twd97</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue-js/">vue.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">標籤雲</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/D3-js/" style="font-size: 12px;">D3.js</a> <a href="/tags/Fusion-Table/" style="font-size: 10px;">Fusion Table</a> <a href="/tags/GeoJSON/" style="font-size: 10px;">GeoJSON</a> <a href="/tags/Geocoder/" style="font-size: 10px;">Geocoder</a> <a href="/tags/Heatmap/" style="font-size: 10px;">Heatmap</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/chrome/" style="font-size: 10px;">chrome</a> <a href="/tags/d3-js/" style="font-size: 16px;">d3.js</a> <a href="/tags/devtools/" style="font-size: 10px;">devtools</a> <a href="/tags/donut-chart/" style="font-size: 10px;">donut chart</a> <a href="/tags/ecmascript/" style="font-size: 10px;">ecmascript</a> <a href="/tags/events/" style="font-size: 10px;">events</a> <a href="/tags/gis/" style="font-size: 10px;">gis</a> <a href="/tags/google-map/" style="font-size: 20px;">google map</a> <a href="/tags/html/" style="font-size: 12px;">html</a> <a href="/tags/html5/" style="font-size: 10px;">html5</a> <a href="/tags/infoWindow/" style="font-size: 10px;">infoWindow</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/javascript/" style="font-size: 14px;">javascript</a> <a href="/tags/mobile/" style="font-size: 10px;">mobile</a> <a href="/tags/opendata/" style="font-size: 14px;">opendata</a> <a href="/tags/php/" style="font-size: 10px;">php</a> <a href="/tags/rwd/" style="font-size: 10px;">rwd</a> <a href="/tags/street-map-api/" style="font-size: 10px;">street map api</a> <a href="/tags/twd97/" style="font-size: 10px;">twd97</a> <a href="/tags/vue-js/" style="font-size: 18px;">vue.js</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">彙整</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">五月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">十月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">九月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">五月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">四月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">八月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">十一月 2011</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/posts/2017/05/30/VueJS-V2-在-v-for-列表完成分頁功能/">[VueJS-V2] 在 v-for 列表完成分頁功能 (從 v1 至 v2)</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2017/04/04/筆記-Google-街景-API-加入圖標與角度計算/">[筆記] Google 街景 API 加入圖標與預設角度計算</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2016/12/08/透過-VueCLI-建置專案時，自動切換-devtools-的-debug-環境/">透過 Vue-CLI 建置專案時，自動切換 devtools 的 debug 環境</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2016/10/13/利用-yarn-安裝-vue-cli/">利用 Yarn 安裝 Vue-cli</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2016/10/11/筆記-透過-Composition-Events-增強非拉丁語系輸入法對輸入框的支援/">[筆記] 透過 Composition Events 增強非拉丁語系輸入法對輸入框的支援</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Kuro Hsu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

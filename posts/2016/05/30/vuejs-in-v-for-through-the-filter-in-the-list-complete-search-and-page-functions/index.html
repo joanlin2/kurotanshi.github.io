@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>[VueJS] 在 v-for 列表中透過 filter 完成搜尋與分頁的功能 | Kuro&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="最近 Vue.js 正夯，所以手上幾個東西打算用這個來改寫，關於 Vue.js 的基本介紹可以參考小弟的投影片，這裡就不再贅述。    有用過 Vue.js 開發的朋友一定知道它提供的 filter 功能十分強大，在 v-for 列表中使用 filterBy 可以在一行內完成列表搜尋的功能： 123456789&amp;lt;div id=&quot;filter-by-example&quot;&amp;gt;  &amp;lt;inpu">
+<meta name="keywords" content="vue.js">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[VueJS] 在 v-for 列表中透過 filter 完成搜尋與分頁的功能">
+<meta property="og:url" content="https://kuro.tw/posts/2016/05/30/vuejs-in-v-for-through-the-filter-in-the-list-complete-search-and-page-functions/index.html">
+<meta property="og:site_name" content="Kuro&#39;s Blog">
+<meta property="og:description" content="最近 Vue.js 正夯，所以手上幾個東西打算用這個來改寫，關於 Vue.js 的基本介紹可以參考小弟的投影片，這裡就不再贅述。    有用過 Vue.js 開發的朋友一定知道它提供的 filter 功能十分強大，在 v-for 列表中使用 filterBy 可以在一行內完成列表搜尋的功能： 123456789&amp;lt;div id=&quot;filter-by-example&quot;&amp;gt;  &amp;lt;inpu">
+<meta property="og:updated_time" content="2017-06-07T05:16:03.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[VueJS] 在 v-for 列表中透過 filter 完成搜尋與分頁的功能">
+<meta name="twitter:description" content="最近 Vue.js 正夯，所以手上幾個東西打算用這個來改寫，關於 Vue.js 的基本介紹可以參考小弟的投影片，這裡就不再贅述。    有用過 Vue.js 開發的朋友一定知道它提供的 filter 功能十分強大，在 v-for 列表中使用 filterBy 可以在一行內完成列表搜尋的功能： 123456789&amp;lt;div id=&quot;filter-by-example&quot;&amp;gt;  &amp;lt;inpu">
+  
+    <link rel="alternate" href="/atom.xml" title="Kuro&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Kuro&#39;s Blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜尋"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://kuro.tw"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-vuejs-in-v-for-through-the-filter-in-the-list-complete-search-and-page-functions" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/posts/2016/05/30/vuejs-in-v-for-through-the-filter-in-the-list-complete-search-and-page-functions/" class="article-date">
+  <time datetime="2016-05-30T06:30:00.000Z" itemprop="datePublished">2016-05-30</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/vue-js/">vue.js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      [VueJS] 在 v-for 列表中透過 filter 完成搜尋與分頁的功能
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近 <a href="https://vuejs.org/" target="_blank" rel="external">Vue.js</a> 正夯，所以手上幾個東西打算用這個來改寫，關於 Vue.js 的基本介紹可以參考小弟的投影片，這裡就不再贅述。</p>
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/DLQDvLrRSNunsY" width="476" height="400" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:10px; max-width: 100%;" allowfullscreen> </iframe>
+
+<p>有用過 Vue.js 開發的朋友一定知道它提供的 filter 功能十分強大，在 <code>v-for</code> 列表中使用 <code>filterBy</code> 可以在一行內完成列表搜尋的功能：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"filter-by-example"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">v-model</span>=<span class="string">"n"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">ul</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- 透過 input 欄位的 v-model n 與 user.name 做模糊比對 --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-for</span>=<span class="string">"user in users | filterBy n in 'name'"</span>&gt;</span></div><div class="line">      &#123;&#123; user.name &#125;&#125;</div><div class="line">    <span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>若是要限制顯示的筆數也能用 <code>limitBy</code> 做到，進而完成分頁的功能。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- 只顯示前 10 個元素 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">v-for</span>=<span class="string">"item in items | limitBy 10"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- 顯示第 5 到 15 筆元素--&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">v-for</span>=<span class="string">"item in items | limitBy 10 5"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>這次遇到的問題是這樣的，如果我們想要同時完成「搜尋」與「分頁」的需求，光靠 <code>filterBy</code> 與 <code>limitBy</code> 就不是那麼容易做到，還好 Vue.js 提供了<a href="http://vuejs.org/guide/custom-filter.html" target="_blank" rel="external">自訂 filter</a> 的功能：先用 filterBy 過濾，再透過自訂 recordLength 記錄過濾後的資料數量，最後再用 limitBy 搭配頁籤切換頁面。
+小心 filter 的順序，filter 會依序執行，然後再繼續下個 filter。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">tr</span> <span class="attr">v-for</span>=<span class="string">" r in rows</span></span></div><div class="line">             | filterBy filter_name in 'name'</div><div class="line">             | recordLength 'filteredRowCount'</div><div class="line">             | limitBy countOfPage pageStart "&gt;</div><div class="line">    <span class="tag">&lt;<span class="name">td</span>&gt;</span>......<span class="tag">&lt;/<span class="name">td</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">tr</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>然後是自定的 filter <code>recordLength</code>：
+result 代表傳入的資料， key 則是從 view 帶入的參數，這個範例是 <code>filteredRowCount</code>。</p>
+<p>這裡透過 <code>vm.$set</code> 來將過濾後的數量指定至 vue 實體，以便可以直接在 Vue 實體使用。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Vue.filter(<span class="string">'recordLength'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">result, key</span>) </span>&#123;</div><div class="line">  <span class="keyword">this</span>.$set(key, result.length);</div><div class="line">  <span class="keyword">return</span> result;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>最後在頁籤的部分，我們就可以簡單透過 <code>filter_name</code> 欄位是否空白來切換是否透過 <code>filteredRowCount</code> 計算總頁數:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">totalPage: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">  <span class="keyword">if</span>( <span class="keyword">this</span>.filter_name.trim() === <span class="string">''</span> ) &#123;</div><div class="line">    <span class="keyword">return</span> <span class="built_in">Math</span>.ceil(<span class="keyword">this</span>.rows.length / <span class="keyword">this</span>.countOfPage);</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">else</span>&#123;</div><div class="line">    <span class="keyword">return</span> <span class="built_in">Math</span>.ceil(<span class="keyword">this</span>.filteredRowCount / <span class="keyword">this</span>.countOfPage);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>完整的 <a href="http://jsbin.com/bimawidora/1/edit?html,js,output" target="_blank" rel="external">demo</a> 如下:</p>
+<p><a class="jsbin-embed" href="http://jsbin.com/bimawidora/embed?output" target="_blank" rel="external">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?3.35.12"></script></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://kuro.tw/posts/2016/05/30/vuejs-in-v-for-through-the-filter-in-the-list-complete-search-and-page-functions/" data-id="cj3mjzsbn001rtut4xv9meue7" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue-js/">vue.js</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/posts/2016/09/30/Vue-2-0-升級小幫手-Vue-migration-helper/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          VueJS 2.0 升級小幫手: Vue migration helper
+        
+      </div>
+    </a>
+  
+  
+    <a href="/posts/2015/12/20/use-d3js-to-create-responsive-histogram/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">利用 d3.js 製作 responsive 的長條圖</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分類</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/D3-js/">D3.js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/ECMAScript/">ECMAScript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/GIS/">GIS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/GeoJSON/">GeoJSON</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Google-Map/">Google Map</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/HTML/">HTML</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/ModernWebConf/">ModernWebConf</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/OpenData/">OpenData</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/android/">android</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue-js/">vue.js</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">標籤</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/D3-js/">D3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Fusion-Table/">Fusion Table</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GeoJSON/">GeoJSON</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Geocoder/">Geocoder</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Heatmap/">Heatmap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/d3-js/">d3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/devtools/">devtools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/donut-chart/">donut chart</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ecmascript/">ecmascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/events/">events</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gis/">gis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/google-map/">google map</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html5/">html5</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/infoWindow/">infoWindow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jQuery/">jQuery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mobile/">mobile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/opendata/">opendata</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rwd/">rwd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/street-map-api/">street map api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/twd97/">twd97</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue-js/">vue.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">標籤雲</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/D3-js/" style="font-size: 12px;">D3.js</a> <a href="/tags/Fusion-Table/" style="font-size: 10px;">Fusion Table</a> <a href="/tags/GeoJSON/" style="font-size: 10px;">GeoJSON</a> <a href="/tags/Geocoder/" style="font-size: 10px;">Geocoder</a> <a href="/tags/Heatmap/" style="font-size: 10px;">Heatmap</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/chrome/" style="font-size: 10px;">chrome</a> <a href="/tags/d3-js/" style="font-size: 16px;">d3.js</a> <a href="/tags/devtools/" style="font-size: 10px;">devtools</a> <a href="/tags/donut-chart/" style="font-size: 10px;">donut chart</a> <a href="/tags/ecmascript/" style="font-size: 10px;">ecmascript</a> <a href="/tags/events/" style="font-size: 10px;">events</a> <a href="/tags/gis/" style="font-size: 10px;">gis</a> <a href="/tags/google-map/" style="font-size: 20px;">google map</a> <a href="/tags/html/" style="font-size: 12px;">html</a> <a href="/tags/html5/" style="font-size: 10px;">html5</a> <a href="/tags/infoWindow/" style="font-size: 10px;">infoWindow</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/javascript/" style="font-size: 14px;">javascript</a> <a href="/tags/mobile/" style="font-size: 10px;">mobile</a> <a href="/tags/opendata/" style="font-size: 14px;">opendata</a> <a href="/tags/php/" style="font-size: 10px;">php</a> <a href="/tags/rwd/" style="font-size: 10px;">rwd</a> <a href="/tags/street-map-api/" style="font-size: 10px;">street map api</a> <a href="/tags/twd97/" style="font-size: 10px;">twd97</a> <a href="/tags/vue-js/" style="font-size: 18px;">vue.js</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">彙整</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">五月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">十月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">九月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">五月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">四月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">八月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">十一月 2011</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/posts/2017/05/30/VueJS-V2-在-v-for-列表完成分頁功能/">[VueJS-V2] 在 v-for 列表完成分頁功能 (從 v1 至 v2)</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2017/04/04/筆記-Google-街景-API-加入圖標與角度計算/">[筆記] Google 街景 API 加入圖標與預設角度計算</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2016/12/08/透過-VueCLI-建置專案時，自動切換-devtools-的-debug-環境/">透過 Vue-CLI 建置專案時，自動切換 devtools 的 debug 環境</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2016/10/13/利用-yarn-安裝-vue-cli/">利用 Yarn 安裝 Vue-cli</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2016/10/11/筆記-透過-Composition-Events-增強非拉丁語系輸入法對輸入框的支援/">[筆記] 透過 Composition Events 增強非拉丁語系輸入法對輸入框的支援</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Kuro Hsu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

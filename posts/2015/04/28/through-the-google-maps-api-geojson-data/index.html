@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>透過 Google Maps API 處理 GeoJSON 資料 | Kuro&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="在說明 Google Map 如何存取 GeoJSON 前，先來簡單介紹 GeoJSON。 GeoJSON 是一種專門處理地理資訊 (GIS) 結構的 JSON 標準格式。 一個 GeoJSON 物件可以用來代表點 (Point)，線 (LineString)，多邊形 (Polygon) 等等的幾何結構，以及特徵 (Feature) 的集合，或是一系列的特徵 (FeatureCollection)">
+<meta name="keywords" content="google map,GeoJSON">
+<meta property="og:type" content="article">
+<meta property="og:title" content="透過 Google Maps API 處理 GeoJSON 資料">
+<meta property="og:url" content="https://kuro.tw/posts/2015/04/28/through-the-google-maps-api-geojson-data/index.html">
+<meta property="og:site_name" content="Kuro&#39;s Blog">
+<meta property="og:description" content="在說明 Google Map 如何存取 GeoJSON 前，先來簡單介紹 GeoJSON。 GeoJSON 是一種專門處理地理資訊 (GIS) 結構的 JSON 標準格式。 一個 GeoJSON 物件可以用來代表點 (Point)，線 (LineString)，多邊形 (Polygon) 等等的幾何結構，以及特徵 (Feature) 的集合，或是一系列的特徵 (FeatureCollection)">
+<meta property="og:image" content="http://user-image.logdown.io/user/3292/blog/3340/post/262352/sSKDGsS7RUqG2TluFYJC_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-04-28%20%E4%B8%8B%E5%8D%887.15.40.png">
+<meta property="og:image" content="http://user-image.logdown.io/user/3292/blog/3340/post/262352/u5lfzGXOQVaVY7zkw57q_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-04-28%20%E4%B8%8B%E5%8D%887.15.46.png">
+<meta property="og:updated_time" content="2017-06-07T05:16:03.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="透過 Google Maps API 處理 GeoJSON 資料">
+<meta name="twitter:description" content="在說明 Google Map 如何存取 GeoJSON 前，先來簡單介紹 GeoJSON。 GeoJSON 是一種專門處理地理資訊 (GIS) 結構的 JSON 標準格式。 一個 GeoJSON 物件可以用來代表點 (Point)，線 (LineString)，多邊形 (Polygon) 等等的幾何結構，以及特徵 (Feature) 的集合，或是一系列的特徵 (FeatureCollection)">
+<meta name="twitter:image" content="http://user-image.logdown.io/user/3292/blog/3340/post/262352/sSKDGsS7RUqG2TluFYJC_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-04-28%20%E4%B8%8B%E5%8D%887.15.40.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Kuro&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Kuro&#39;s Blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜尋"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://kuro.tw"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-through-the-google-maps-api-geojson-data" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/posts/2015/04/28/through-the-google-maps-api-geojson-data/" class="article-date">
+  <time datetime="2015-04-28T04:10:00.000Z" itemprop="datePublished">2015-04-28</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Google-Map/">Google Map</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      透過 Google Maps API 處理 GeoJSON 資料
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在說明 Google Map 如何存取 GeoJSON 前，先來簡單介紹 GeoJSON。</p>
+<p><a href="http://geojson.org/" title="GeoJSON" target="_blank" rel="external">GeoJSON</a> 是一種專門處理地理資訊 (GIS) 結構的 JSON 標準格式。 一個 GeoJSON 物件可以用來代表<strong>點</strong> (Point)，<strong>線</strong> (LineString)，<strong>多邊形</strong> (Polygon) 等等的幾何結構，以及<strong>特徵</strong> (Feature) 的集合，或是<strong>一系列的特徵</strong> (FeatureCollection)。</p>
+<p>也因為 GeoJSON 是一種基於 JSON 的公開標準，其結構簡單且容易讀取的特性也廣受開發者的歡迎，有不少開發程式庫開始支援 GeoJSON 的處理，也有許多政府開放資料(官方或非官方)開始提供 GeoJSON 作為其資料格式。</p>
+<p>一個簡單的 GeoJSON 會長得像這個樣子：
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    <span class="string">"type"</span>: <span class="string">"FeatureCollection"</span>,</div><div class="line">    <span class="string">"features"</span>: [&#123;</div><div class="line">        <span class="string">"type"</span>: <span class="string">"Feature"</span>,</div><div class="line">        <span class="string">"geometry"</span>: &#123;</div><div class="line">            <span class="string">"type"</span>: <span class="string">"Point"</span>,</div><div class="line">            <span class="string">"coordinates"</span>: [<span class="number">102.0</span>, <span class="number">0.5</span>]</div><div class="line">        &#125;,</div><div class="line">        <span class="string">"properties"</span>: &#123;</div><div class="line">            <span class="string">"prop0"</span>: <span class="string">"value0"</span></div><div class="line">        &#125;</div><div class="line">    &#125;, &#123;</div><div class="line">        <span class="string">"type"</span>: <span class="string">"Feature"</span>,</div><div class="line">        <span class="string">"geometry"</span>: &#123;</div><div class="line">            <span class="string">"type"</span>: <span class="string">"LineString"</span>,</div><div class="line">            <span class="string">"coordinates"</span>: [</div><div class="line">                [<span class="number">102.0</span>, <span class="number">0.0</span>],</div><div class="line">                [<span class="number">103.0</span>, <span class="number">1.0</span>],</div><div class="line">                [<span class="number">104.0</span>, <span class="number">0.0</span>],</div><div class="line">                [<span class="number">105.0</span>, <span class="number">1.0</span>]</div><div class="line">            ]</div><div class="line">        &#125;,</div><div class="line">        <span class="string">"properties"</span>: &#123;</div><div class="line">            <span class="string">"prop0"</span>: <span class="string">"value0"</span>,</div><div class="line">            <span class="string">"prop1"</span>: <span class="number">0.0</span></div><div class="line">        &#125;</div><div class="line">    &#125;, &#123;</div><div class="line">        <span class="string">"type"</span>: <span class="string">"Feature"</span>,</div><div class="line">        <span class="string">"geometry"</span>: &#123;</div><div class="line">            <span class="string">"type"</span>: <span class="string">"Polygon"</span>,</div><div class="line">            <span class="string">"coordinates"</span>: [</div><div class="line">                [</div><div class="line">                    [<span class="number">100.0</span>, <span class="number">0.0</span>],</div><div class="line">                    [<span class="number">101.0</span>, <span class="number">0.0</span>],</div><div class="line">                    [<span class="number">101.0</span>, <span class="number">1.0</span>],</div><div class="line">                    [<span class="number">100.0</span>, <span class="number">1.0</span>],</div><div class="line">                    [<span class="number">100.0</span>, <span class="number">0.0</span>]</div><div class="line">                ]</div><div class="line">            ]</div><div class="line">        &#125;,</div><div class="line">        <span class="string">"properties"</span>: &#123;</div><div class="line">            <span class="string">"prop0"</span>: <span class="string">"value0"</span>,</div><div class="line">            <span class="string">"prop1"</span>: &#123;</div><div class="line">                <span class="string">"this"</span>: <span class="string">"that"</span></div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;]</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>如上所示，每一筆資料都會是一個「<strong>Feature</strong>」物件，地理位置相關資訊會存放在 geometry 物件內，其中分別有「<strong>type</strong>」以及「<strong>coordinates</strong>」屬性，type 用來表示資料類別，可以是點，線，甚至是多邊形等；而 coordinates 用來存放經緯度座標。而其他的相關資訊則會放在「<strong>properties</strong>」內，以 <strong>key: value</strong> 方式呈現。</p>
+<p>簡單介紹就到此，有興趣的朋友可以參考 <a href="http://geojson.org/" target="_blank" rel="external">http://geojson.org/</a>
+註：這裏有中國網友翻譯的 GeoJSON 規格 <a href="http://www.oschina.net/translate/geojson-spec" target="_blank" rel="external">http://www.oschina.net/translate/geojson-spec</a></p>
+<p>回到主題。
+Google Map 匯入 GeoJSON 的方式非常簡單，如果已經有一個完整的 GeoJSON 檔案的話，那麼透過</p>
+<p><code>map.data.loadGeoJson(FILE-URL);</code></p>
+<p>利用這一行程式碼就可以載入 GeoJSON 至 Google Map 的 Data Layer 了。</p>
+<p>簡單範例：
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> map;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">initMap</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="comment">// 地圖初始設定</span></div><div class="line">    <span class="keyword">var</span> mapOptions = &#123;</div><div class="line">        <span class="attr">center</span>: <span class="keyword">new</span> google.maps.LatLng(<span class="number">25.04674</span>, <span class="number">121.54168</span>),</div><div class="line">        <span class="attr">zoom</span>: <span class="number">13</span>,</div><div class="line">        <span class="attr">mapTypeId</span>: google.maps.MapTypeId.ROADMAP</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="comment">// GeoJSON file</span></div><div class="line">    <span class="keyword">var</span> url = <span class="string">'https://dl.dropboxusercontent.com/u/12537630/geo.json'</span>;</div><div class="line"></div><div class="line">    <span class="keyword">var</span> mapElement = <span class="built_in">document</span>.getElementById(<span class="string">"mapDiv"</span>);</div><div class="line"></div><div class="line">    <span class="comment">// Google 地圖初始化</span></div><div class="line">    map = <span class="keyword">new</span> google.maps.Map(mapElement, mapOptions);</div><div class="line"></div><div class="line">    <span class="comment">// 載入 GeoJSON 資料</span></div><div class="line">    map.data.loadGeoJson(url);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>DEMO: <a href="http://jsbin.com/totuzisobo/1/" target="_blank" rel="external">http://jsbin.com/totuzisobo/1/</a>
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/262352/sSKDGsS7RUqG2TluFYJC_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-04-28%20%E4%B8%8B%E5%8D%887.15.40.png" alt="螢幕快照 2015-04-28 下午7.15.40.png"></p>
+<p>如果希望載入的資料可以有自訂的樣式的話，可以透過 <code>map.data.setStyle</code> 在載入前指定好希望的 style，這裏以 marker 的圖示為例：</p>
+<p>圖示資訊我放在 GeoJSON 的 <code>properties.icon</code> 內，如下 (其中一筆 point 的內容)：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="string">"type"</span>: <span class="string">"Feature"</span>,</div><div class="line"><span class="string">"geometry"</span>: &#123;</div><div class="line"> <span class="string">"type"</span>: <span class="string">"Point"</span>,</div><div class="line"> <span class="string">"coordinates"</span>: [ <span class="number">121.51771545410156</span>, <span class="number">25.028294990979614</span> ]</div><div class="line">&#125;,</div><div class="line"><span class="string">"properties"</span>: &#123;</div><div class="line">true<span class="string">"icon"</span>: <span class="string">"http://google-maps-icons.googlecode.com/files/vegetarian.png"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>於是我們可以透過 <code>feature.getProperty(&#39;icon&#39;)</code> 去指定每一筆 point 的圖示：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 自訂樣式</span></div><div class="line">map.data.setStyle(<span class="function"><span class="keyword">function</span>(<span class="params">feature</span>) </span>&#123;</div><div class="line">  <span class="keyword">return</span> &#123; <span class="string">'icon'</span>: feature.getProperty(<span class="string">'icon'</span>) &#125;;</div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="comment">// 載入 GeoJSON 資料</span></div><div class="line">map.data.loadGeoJson(url);</div></pre></td></tr></table></figure>
+<p>DEMO: <a href="http://jsbin.com/xikaqe/1/" target="_blank" rel="external">http://jsbin.com/xikaqe/1/</a>
+<img src="http://user-image.logdown.io/user/3292/blog/3340/post/262352/u5lfzGXOQVaVY7zkw57q_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-04-28%20%E4%B8%8B%E5%8D%887.15.46.png" alt="螢幕快照 2015-04-28 下午7.15.46.png"></p>
+<p>如果希望透過 ajax 方式載入 GeoJSON 的話也非常簡單，在取得 ajax 回傳資料時，用 <code>map.data.addGeoJson(res);</code> 這行就可以載入資料了。</p>
+<p>以 jQuery 為例，如:
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$.get(FILE-URL, <span class="function"><span class="keyword">function</span>(<span class="params">res</span>) </span>&#123; map.data.addGeoJson(res); &#125;);</div></pre></td></tr></table></figure></p>
+<p>有個整理好的 GeoJSON，只需要一行就可以很輕鬆地在 Google Map 產生想要的圖標了。
+如果想在圖表上處理點擊等等的事件，還是得另外處理喔。</p>
+<p>參考資料:
+<a href="https://developers.google.com/maps/documentation/javascript/examples/layer-data-simple" target="_blank" rel="external">https://developers.google.com/maps/documentation/javascript/examples/layer-data-simple</a>
+<a href="https://developers.google.com/maps/documentation/javascript/examples/layer-data-quakes" target="_blank" rel="external">https://developers.google.com/maps/documentation/javascript/examples/layer-data-quakes</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://kuro.tw/posts/2015/04/28/through-the-google-maps-api-geojson-data/" data-id="cj3mjzsbi001itut4o4zz2dv1" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/GeoJSON/">GeoJSON</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/google-map/">google map</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/posts/2015/04/29/a-brief-talk-on-google-map-heat-map-api/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          淺談 Google map Heat map API 
+        
+      </div>
+    </a>
+  
+  
+    <a href="/posts/2015/04/27/address-information-is-obtained-through-google-map-geocoder-with-the-latitude-and-longitude/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">透過 Google map Geocoder API 以經緯度轉換地址資訊</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分類</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/D3-js/">D3.js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/ECMAScript/">ECMAScript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/GIS/">GIS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/GeoJSON/">GeoJSON</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Google-Map/">Google Map</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/HTML/">HTML</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/ModernWebConf/">ModernWebConf</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/OpenData/">OpenData</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/android/">android</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue-js/">vue.js</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">標籤</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/D3-js/">D3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Fusion-Table/">Fusion Table</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GeoJSON/">GeoJSON</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Geocoder/">Geocoder</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Heatmap/">Heatmap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/d3-js/">d3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/devtools/">devtools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/donut-chart/">donut chart</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ecmascript/">ecmascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/events/">events</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gis/">gis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/google-map/">google map</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html5/">html5</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/infoWindow/">infoWindow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jQuery/">jQuery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mobile/">mobile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/opendata/">opendata</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rwd/">rwd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/street-map-api/">street map api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/twd97/">twd97</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue-js/">vue.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">標籤雲</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/D3-js/" style="font-size: 12px;">D3.js</a> <a href="/tags/Fusion-Table/" style="font-size: 10px;">Fusion Table</a> <a href="/tags/GeoJSON/" style="font-size: 10px;">GeoJSON</a> <a href="/tags/Geocoder/" style="font-size: 10px;">Geocoder</a> <a href="/tags/Heatmap/" style="font-size: 10px;">Heatmap</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/chrome/" style="font-size: 10px;">chrome</a> <a href="/tags/d3-js/" style="font-size: 16px;">d3.js</a> <a href="/tags/devtools/" style="font-size: 10px;">devtools</a> <a href="/tags/donut-chart/" style="font-size: 10px;">donut chart</a> <a href="/tags/ecmascript/" style="font-size: 10px;">ecmascript</a> <a href="/tags/events/" style="font-size: 10px;">events</a> <a href="/tags/gis/" style="font-size: 10px;">gis</a> <a href="/tags/google-map/" style="font-size: 20px;">google map</a> <a href="/tags/html/" style="font-size: 12px;">html</a> <a href="/tags/html5/" style="font-size: 10px;">html5</a> <a href="/tags/infoWindow/" style="font-size: 10px;">infoWindow</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/javascript/" style="font-size: 14px;">javascript</a> <a href="/tags/mobile/" style="font-size: 10px;">mobile</a> <a href="/tags/opendata/" style="font-size: 14px;">opendata</a> <a href="/tags/php/" style="font-size: 10px;">php</a> <a href="/tags/rwd/" style="font-size: 10px;">rwd</a> <a href="/tags/street-map-api/" style="font-size: 10px;">street map api</a> <a href="/tags/twd97/" style="font-size: 10px;">twd97</a> <a href="/tags/vue-js/" style="font-size: 18px;">vue.js</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">彙整</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">五月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">十月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">九月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">五月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">四月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">八月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">十一月 2011</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/posts/2017/05/30/VueJS-V2-在-v-for-列表完成分頁功能/">[VueJS-V2] 在 v-for 列表完成分頁功能 (從 v1 至 v2)</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2017/04/04/筆記-Google-街景-API-加入圖標與角度計算/">[筆記] Google 街景 API 加入圖標與預設角度計算</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2016/12/08/透過-VueCLI-建置專案時，自動切換-devtools-的-debug-環境/">透過 Vue-CLI 建置專案時，自動切換 devtools 的 debug 環境</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2016/10/13/利用-yarn-安裝-vue-cli/">利用 Yarn 安裝 Vue-cli</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2016/10/11/筆記-透過-Composition-Events-增強非拉丁語系輸入法對輸入框的支援/">[筆記] 透過 Composition Events 增強非拉丁語系輸入法對輸入框的支援</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Kuro Hsu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

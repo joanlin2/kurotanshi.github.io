@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>[note] jQuery 與 d3.js 的一些不同之處 | Kuro&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="以前跟人家介紹 d3.js 的時候，我都會笑稱 d3.js 其實就是 SVG 界的 jQuery。 但是最近發現不少人對兩者的 select 以及 append 有些疑問，特別把它寫下來紀錄。 先說大家比較熟悉的 jQuery： 123$(&quot;body&quot;)  .append(&quot;&amp;lt;div&amp;gt;&amp;lt;/div&amp;gt;&quot;)  .append(&quot;&amp;lt;em&amp;gt;&amp;lt;/em&amp;gt;&quot;); 上">
+<meta name="keywords" content="d3.js,jQuery">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[note] jQuery 與 d3.js 的一些不同之處">
+<meta property="og:url" content="https://kuro.tw/posts/2015/04/22/note-jquery-and-d3js-some-of-these-differences/index.html">
+<meta property="og:site_name" content="Kuro&#39;s Blog">
+<meta property="og:description" content="以前跟人家介紹 d3.js 的時候，我都會笑稱 d3.js 其實就是 SVG 界的 jQuery。 但是最近發現不少人對兩者的 select 以及 append 有些疑問，特別把它寫下來紀錄。 先說大家比較熟悉的 jQuery： 123$(&quot;body&quot;)  .append(&quot;&amp;lt;div&amp;gt;&amp;lt;/div&amp;gt;&quot;)  .append(&quot;&amp;lt;em&amp;gt;&amp;lt;/em&amp;gt;&quot;); 上">
+<meta property="og:updated_time" content="2017-06-07T05:16:03.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[note] jQuery 與 d3.js 的一些不同之處">
+<meta name="twitter:description" content="以前跟人家介紹 d3.js 的時候，我都會笑稱 d3.js 其實就是 SVG 界的 jQuery。 但是最近發現不少人對兩者的 select 以及 append 有些疑問，特別把它寫下來紀錄。 先說大家比較熟悉的 jQuery： 123$(&quot;body&quot;)  .append(&quot;&amp;lt;div&amp;gt;&amp;lt;/div&amp;gt;&quot;)  .append(&quot;&amp;lt;em&amp;gt;&amp;lt;/em&amp;gt;&quot;); 上">
+  
+    <link rel="alternate" href="/atom.xml" title="Kuro&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Kuro&#39;s Blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜尋"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://kuro.tw"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-note-jquery-and-d3js-some-of-these-differences" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/posts/2015/04/22/note-jquery-and-d3js-some-of-these-differences/" class="article-date">
+  <time datetime="2015-04-21T23:19:00.000Z" itemprop="datePublished">2015-04-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/D3-js/">D3.js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      [note] jQuery 與 d3.js 的一些不同之處
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>以前跟人家介紹 d3.js 的時候，我都會笑稱 d3.js 其實就是 SVG 界的 jQuery。
+但是最近發現不少人對兩者的 select 以及 append 有些疑問，特別把它寫下來紀錄。</p>
+<p>先說大家比較熟悉的 jQuery：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$(<span class="string">"body"</span>)</div><div class="line">  .append(<span class="string">"&lt;div&gt;&lt;/div&gt;"</span>)</div><div class="line">  .append(<span class="string">"&lt;em&gt;&lt;/em&gt;"</span>);</div></pre></td></tr></table></figure>
+<p>上面這段程式碼產生的 HTML 應該會是這樣的</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">em</span>&gt;</span><span class="tag">&lt;/<span class="name">em</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>而在 d3.js 的情況：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">d3.select(<span class="string">"body"</span>)</div><div class="line">  .append(<span class="string">"div"</span>)</div><div class="line">    .append(<span class="string">"em"</span>);</div></pre></td></tr></table></figure>
+<p>所產生的 HTML 結構會是這樣的：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">em</span>&gt;</span><span class="tag">&lt;/<span class="name">em</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>兩者最大的差異點在於 jQuery 的
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$(<span class="string">"body"</span>).append(...)</div></pre></td></tr></table></figure></p>
+<p>回傳的會是 $(&#39;body&#39;) 本身，而 d3.js 的</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">d3.select(<span class="string">"body"</span>).append(...)</div></pre></td></tr></table></figure>
+<p>回傳的會是 append 後的 DOM
+(以上面的範例來說，<code>d3.select(&quot;body&quot;).append(&#39;div&#39;)</code> 回傳的就會是 <code>&lt;div&gt;&lt;/div&gt;</code> )，
+所以再次執行 append 時，就會將 DOM 加入在前一個 append 的元素，也就是 <code>&lt;div&gt;&lt;/div&gt;</code> 之內。</p>
+<p>那麼 jQuery 是否也可以像 d3.js 這樣 append 在新 DOM 內呢？
+先將 em 包在 div 內，最外層再包一層 append 就可以做到了。
+像這樣：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$(<span class="string">"body"</span>).append( $(<span class="string">'&lt;div&gt;'</span>).append( $(<span class="string">'&lt;em&gt;'</span>) ) );</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://kuro.tw/posts/2015/04/22/note-jquery-and-d3js-some-of-these-differences/" data-id="cj3mjzsb80010tut4nkaz0d2g" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/d3-js/">d3.js</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jQuery/">jQuery</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/posts/2015/04/27/address-information-is-obtained-through-google-map-geocoder-with-the-latitude-and-longitude/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          透過 Google map Geocoder API 以經緯度轉換地址資訊
+        
+      </div>
+    </a>
+  
+  
+    <a href="/posts/2014/08/08/google-map-infowindow-bubble-detection-box-is-opened/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">偵測 Google Map 的 InfoWindow 訊息框是否被開啟 (v3)</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分類</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/D3-js/">D3.js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/ECMAScript/">ECMAScript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/GIS/">GIS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/GeoJSON/">GeoJSON</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Google-Map/">Google Map</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/HTML/">HTML</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/ModernWebConf/">ModernWebConf</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/OpenData/">OpenData</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/android/">android</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/vue-js/">vue.js</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">標籤</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/D3-js/">D3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Fusion-Table/">Fusion Table</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GeoJSON/">GeoJSON</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Geocoder/">Geocoder</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Heatmap/">Heatmap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android/">android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/canvas/">canvas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/d3-js/">d3.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/devtools/">devtools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/donut-chart/">donut chart</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ecmascript/">ecmascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/events/">events</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gis/">gis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/google-map/">google map</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html/">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/html5/">html5</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/infoWindow/">infoWindow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jQuery/">jQuery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mobile/">mobile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/opendata/">opendata</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rwd/">rwd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/street-map-api/">street map api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/twd97/">twd97</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue-js/">vue.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/">webpack</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">標籤雲</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/D3-js/" style="font-size: 12px;">D3.js</a> <a href="/tags/Fusion-Table/" style="font-size: 10px;">Fusion Table</a> <a href="/tags/GeoJSON/" style="font-size: 10px;">GeoJSON</a> <a href="/tags/Geocoder/" style="font-size: 10px;">Geocoder</a> <a href="/tags/Heatmap/" style="font-size: 10px;">Heatmap</a> <a href="/tags/android/" style="font-size: 10px;">android</a> <a href="/tags/canvas/" style="font-size: 10px;">canvas</a> <a href="/tags/chrome/" style="font-size: 10px;">chrome</a> <a href="/tags/d3-js/" style="font-size: 16px;">d3.js</a> <a href="/tags/devtools/" style="font-size: 10px;">devtools</a> <a href="/tags/donut-chart/" style="font-size: 10px;">donut chart</a> <a href="/tags/ecmascript/" style="font-size: 10px;">ecmascript</a> <a href="/tags/events/" style="font-size: 10px;">events</a> <a href="/tags/gis/" style="font-size: 10px;">gis</a> <a href="/tags/google-map/" style="font-size: 20px;">google map</a> <a href="/tags/html/" style="font-size: 12px;">html</a> <a href="/tags/html5/" style="font-size: 10px;">html5</a> <a href="/tags/infoWindow/" style="font-size: 10px;">infoWindow</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/javascript/" style="font-size: 14px;">javascript</a> <a href="/tags/mobile/" style="font-size: 10px;">mobile</a> <a href="/tags/opendata/" style="font-size: 14px;">opendata</a> <a href="/tags/php/" style="font-size: 10px;">php</a> <a href="/tags/rwd/" style="font-size: 10px;">rwd</a> <a href="/tags/street-map-api/" style="font-size: 10px;">street map api</a> <a href="/tags/twd97/" style="font-size: 10px;">twd97</a> <a href="/tags/vue-js/" style="font-size: 18px;">vue.js</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">彙整</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">五月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">十二月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">十月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">九月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">七月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">六月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">五月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">四月 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">八月 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/09/">九月 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">十一月 2011</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/posts/2017/05/30/VueJS-V2-在-v-for-列表完成分頁功能/">[VueJS-V2] 在 v-for 列表完成分頁功能 (從 v1 至 v2)</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2017/04/04/筆記-Google-街景-API-加入圖標與角度計算/">[筆記] Google 街景 API 加入圖標與預設角度計算</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2016/12/08/透過-VueCLI-建置專案時，自動切換-devtools-的-debug-環境/">透過 Vue-CLI 建置專案時，自動切換 devtools 的 debug 環境</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2016/10/13/利用-yarn-安裝-vue-cli/">利用 Yarn 安裝 Vue-cli</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2016/10/11/筆記-透過-Composition-Events-增強非拉丁語系輸入法對輸入框的支援/">[筆記] 透過 Composition Events 增強非拉丁語系輸入法對輸入框的支援</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Kuro Hsu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
