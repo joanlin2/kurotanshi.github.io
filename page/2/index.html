@@ -139,7 +139,7 @@ VueJS 2.0 的 virtual DOM 機制，是採用 <a href="https://github.com/snabbdo
 <p>官方也提供了一個完整的 render function 範例：
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> getChildrenTextContent = <span class="function"><span class="keyword">function</span> (<span class="params">children</span>) </span>&#123;</div><div class="line">  <span class="keyword">return</span> children.map(<span class="function"><span class="keyword">function</span> (<span class="params">node</span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> node.children</div><div class="line">      ? getChildrenTextContent(node.children)</div><div class="line">      : node.text</div><div class="line">  &#125;).join(<span class="string">''</span>)</div><div class="line">&#125;</div><div class="line">Vue.component(<span class="string">'anchored-heading'</span>, &#123;</div><div class="line">  <span class="attr">render</span>: <span class="function"><span class="keyword">function</span> (<span class="params">createElement</span>) </span>&#123;</div><div class="line">    <span class="comment">// create kebabCase id</span></div><div class="line">    <span class="keyword">var</span> headingId = getChildrenTextContent(<span class="keyword">this</span>.$slots.default)</div><div class="line">      .toLowerCase()</div><div class="line">      .replace(<span class="regexp">/\W+/g</span>, <span class="string">'-'</span>)</div><div class="line">      .replace(<span class="regexp">/(^\-|\-$)/g</span>, <span class="string">''</span>)</div><div class="line"></div><div class="line">    <span class="keyword">return</span> createElement(</div><div class="line">      <span class="string">'h'</span> + <span class="keyword">this</span>.level,</div><div class="line">      [</div><div class="line">        createElement(<span class="string">'a'</span>, &#123;</div><div class="line">          <span class="attr">attrs</span>: &#123;</div><div class="line">            <span class="attr">name</span>: headingId,</div><div class="line">            <span class="attr">href</span>: <span class="string">'#'</span> + headingId</div><div class="line">          &#125;</div><div class="line">        &#125;, <span class="keyword">this</span>.$slots.default)</div><div class="line">      ]</div><div class="line">    )</div><div class="line">  &#125;,</div><div class="line">  <span class="attr">props</span>: &#123;</div><div class="line">    <span class="attr">level</span>: &#123;</div><div class="line">      <span class="attr">type</span>: <span class="built_in">Number</span>,</div><div class="line">      <span class="attr">required</span>: <span class="literal">true</span></div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure></p>
 <p>當然，你可能跟我一樣覺得一層又一層的 <code>createElement</code> 看了總是讓人厭煩，你也可以透過這個 Plugin: <a href="https://github.com/vuejs/babel-plugin-transform-vue-jsx" target="_blank" rel="external">babel-plugin-transform-vue-jsx</a>，來做 JSX 語法的轉換，如果你曾是 react 應用程式的開發者，應該對 JSX 語法不陌生。 寫起來會像這樣：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> AnchoredHeading <span class="keyword">from</span> <span class="string">'./AnchoredHeading.vue'</span></div><div class="line"></div><div class="line"><span class="keyword">new</span> Vue(&#123;</div><div class="line">  <span class="attr">el</span>: <span class="string">'#demo'</span>,</div><div class="line">  render (h) &#123;</div><div class="line">    <span class="keyword">return</span> (</div><div class="line">      &lt;AnchoredHeading level=&#123;1&#125;&gt;</div><div class="line">        &lt;span&gt;Hello&lt;/span&gt; world!</div><div class="line">      &lt;/AnchoredHeading&gt;</div><div class="line">    )</div><div class="line">  &#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> AnchoredHeading <span class="keyword">from</span> <span class="string">'./AnchoredHeading.vue'</span></div><div class="line"></div><div class="line"><span class="keyword">new</span> Vue(&#123;</div><div class="line">  <span class="attr">el</span>: <span class="string">'#demo'</span>,</div><div class="line">  render (h) &#123;</div><div class="line">    <span class="keyword">return</span> (</div><div class="line">      <span class="xml"><span class="tag">&lt;<span class="name">AnchoredHeading</span> <span class="attr">level</span>=<span class="string">&#123;1&#125;</span>&gt;</span></span></div><div class="line">        <span class="tag">&lt;<span class="name">span</span>&gt;</span>Hello<span class="tag">&lt;/<span class="name">span</span>&gt;</span> world!</div><div class="line">      <span class="tag">&lt;/<span class="name">AnchoredHeading</span>&gt;</span></div><div class="line">    )</div><div class="line">  &#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
 <p>在預設情況中，VueJS 2.0 會將 <code>template</code> 內的 HTML 透過 parse 轉換成 AST，再自動轉換優化成 render function 去建立 virtual DOM。 在建立 virtual DOM 之後，透過 observe 機制與資料進行綁定，再 compile 成實體的 DOM 並渲染至網頁上：</p>
 <p><img src="/static/img/vue2-rendering-flow.png">
 <span style="font-size: 12px;">參考資料與圖片來源： <a href="https://speakerdeck.com/kazupon/next-vue-dot-js-2-dot-0" target="_blank" rel="external">Next Vue.js 2.0 by kazupon</a></span></p>
@@ -161,7 +161,7 @@ VueJS 2.0 的 virtual DOM 機制，是採用 <a href="https://github.com/snabbdo
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://kuro.tw/posts/2016/10/03/VueJS-V1-與-V2-元件實體之差異/" data-id="cj3mlngb90002qit47l64m7o7" class="article-share-link">Share</a>
+      <a data-url="https://kuro.tw/posts/2016/10/03/VueJS-V1-與-V2-元件實體之差異/" data-id="cj3mlsm060004t9t4th12lwpw" class="article-share-link">Share</a>
       
         <a href="https://kuro.tw/posts/2016/10/03/VueJS-V1-與-V2-元件實體之差異/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -218,7 +218,7 @@ VueJS 2.0 的 virtual DOM 機制，是採用 <a href="https://github.com/snabbdo
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://kuro.tw/posts/2016/09/30/Vue-2-0-升級小幫手-Vue-migration-helper/" data-id="cj3mlngb10000qit4t29bez20" class="article-share-link">Share</a>
+      <a data-url="https://kuro.tw/posts/2016/09/30/Vue-2-0-升級小幫手-Vue-migration-helper/" data-id="cj3mlslzv0000t9t4mxg2shvi" class="article-share-link">Share</a>
       
         <a href="https://kuro.tw/posts/2016/09/30/Vue-2-0-升級小幫手-Vue-migration-helper/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -280,7 +280,7 @@ result 代表傳入的資料， key 則是從 view 帶入的參數，這個範�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://kuro.tw/posts/2016/05/30/vuejs-in-v-for-through-the-filter-in-the-list-complete-search-and-page-functions/" data-id="cj3mlngd1001vqit4d7lrb1dj" class="article-share-link">Share</a>
+      <a data-url="https://kuro.tw/posts/2016/05/30/vuejs-in-v-for-through-the-filter-in-the-list-complete-search-and-page-functions/" data-id="cj3mlsm1y001ut9t47vy9hfmj" class="article-share-link">Share</a>
       
         <a href="https://kuro.tw/posts/2016/05/30/vuejs-in-v-for-through-the-filter-in-the-list-complete-search-and-page-functions/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -365,7 +365,7 @@ result 代表傳入的資料， key 則是從 view 帶入的參數，這個範�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://kuro.tw/posts/2015/12/20/use-d3js-to-create-responsive-histogram/" data-id="cj3mlngcv001lqit4d1wn5c4u" class="article-share-link">Share</a>
+      <a data-url="https://kuro.tw/posts/2015/12/20/use-d3js-to-create-responsive-histogram/" data-id="cj3mlsm1r001kt9t4ewysepu2" class="article-share-link">Share</a>
       
         <a href="https://kuro.tw/posts/2015/12/20/use-d3js-to-create-responsive-histogram/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -450,7 +450,7 @@ result 代表傳入的資料， key 則是從 view 帶入的參數，這個範�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://kuro.tw/posts/2015/10/15/using-google-fusion-table-without-writing-code-or-topic-maps/" data-id="cj3mlngcy001sqit4pb44z4m4" class="article-share-link">Share</a>
+      <a data-url="https://kuro.tw/posts/2015/10/15/using-google-fusion-table-without-writing-code-or-topic-maps/" data-id="cj3mlsm1w001rt9t4awsgk8kt" class="article-share-link">Share</a>
       
         <a href="https://kuro.tw/posts/2015/10/15/using-google-fusion-table-without-writing-code-or-topic-maps/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -504,7 +504,7 @@ result 代表傳入的資料， key 則是從 view 帶入的參數，這個範�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://kuro.tw/posts/2015/09/30/use-google-map-view-rainfall-simulation-of-flooding-in-taipei-city-map/" data-id="cj3mlngcx001oqit4zqncy44t" class="article-share-link">Share</a>
+      <a data-url="https://kuro.tw/posts/2015/09/30/use-google-map-view-rainfall-simulation-of-flooding-in-taipei-city-map/" data-id="cj3mlsm1u001nt9t4t56lq2ym" class="article-share-link">Share</a>
       
         <a href="https://kuro.tw/posts/2015/09/30/use-google-map-view-rainfall-simulation-of-flooding-in-taipei-city-map/#disqus_thread" class="article-comment-link">留言</a>
       
@@ -619,7 +619,7 @@ result 代表傳入的資料， key 則是從 view 帶入的參數，這個範�
 </nav>
     
 <script>
-  var disqus_shortname = 'kurohsu';
+  var disqus_shortname = 'kurotw';
   
   (function(){
     var dsq = document.createElement('script');
