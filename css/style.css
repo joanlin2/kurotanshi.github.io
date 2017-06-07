@@ -180,7 +180,7 @@ div {
         color: #aa4049; }
   .post .post-meta {
     padding: 0;
-    margin: 15px 0 0;
+    margin: 20px 0 0;
     color: #6E7173;
     float: left;
     display: inline;
@@ -189,6 +189,8 @@ div {
       font-family: "FontAwesome";
       content: "\f073";
       padding-right: 0.3em; }
+    .post .post-meta > span, .post .post-meta #busuanzi_value_page_pv {
+      margin-left: 6px; }
     .post .post-meta .category:before {
       font-family: "FontAwesome";
       content: "\f07c";
@@ -228,7 +230,7 @@ div {
     font-size: 15px;
     line-height: 1.77;
     color: #444;
-    padding-top: 15px;
+    padding-top: 20px;
     text-align: justify;
     text-justify: distribute;
     word-break: normal; }
@@ -264,7 +266,9 @@ div {
       margin: 2.4em auto;
       border: none;
       border-top: 1px solid #eee;
-      position: relative; }
+      position: relative;
+      display: block;
+      width: 80%; }
     .post .post-content img {
       max-width: 100%;
       padding: 0.5em 0;
@@ -287,7 +291,7 @@ div {
         .post .post-content ul a:hover, .post .post-content ol a:hover {
           text-decoration: underline; }
   .post .tags {
-    padding-bottom: 1em; }
+    padding: 1em 0; }
     .post .tags a {
       margin-right: .5em; }
       .post .tags a:before {
@@ -740,22 +744,21 @@ pre {
 .readmore {
   position: relative;
   height: auto;
-  top: 2em; }
+  top: 1.7em; }
 
 .readmore a {
   font-size: 14px;
   color: #444;
   margin: -10px 0;
-  padding: 5px 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  padding: 10px 20px;
+  border-bottom: 2px solid transparent;
   float: right; }
   .readmore a:after {
     font-family: "FontAwesome";
     content: "\f101";
     padding-left: 0.3em; }
   .readmore a:hover {
-    background: #F8F8F8;
+    background: #f7f7f7;
     border-bottom-color: #D26911; }
 
 /* duoshuo style*/
@@ -1392,22 +1395,24 @@ figure.highlight,
     font-size: 15px;
     color: #555;
     border-bottom: none;
-    float: left; }
+    float: left;
+    padding: 5px 10px; }
     .post-nav a.pre {
       float: left; }
       .post-nav a.pre:before {
         font-family: "FontAwesome";
-        content: "\f0d9";
-        padding-right: 0.3em; }
+        content: "\f053";
+        padding-right: 10px; }
     .post-nav a.next {
       float: right; }
       .post-nav a.next:after {
         font-family: "FontAwesome";
-        content: "\f0da";
-        padding-left: 0.3em; }
+        content: "\f054";
+        padding-left: 10px; }
     .post-nav a:hover {
       border-bottom: none;
-      color: #222; }
+      background-color: #f7f8f8;
+      color: #AA4049; }
 
 /* toc*/
 .toc-article {
@@ -1454,6 +1459,7 @@ table {
 .article-share-link {
   cursor: pointer;
   float: right;
+  margin-top: 20px;
   margin-left: 20px; }
   .article-share-link:before {
     font-family: "FontAwesome";
