@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://kuro.tw/"/>
-  <updated>2017-06-07T10:40:38.000Z</updated>
+  <updated>2017-07-10T16:48:08.000Z</updated>
   <id>https://kuro.tw/</id>
   
   <author>
@@ -14,6 +14,53 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>不需編譯也能載入 .vue 元件檔: 使用 http-vue-loader</title>
+    <link href="https://kuro.tw/posts/2017/07/11/%E4%B8%8D%E9%9C%80%E7%B7%A8%E8%AD%AF%E4%B9%9F%E8%83%BD%E8%BC%89%E5%85%A5-vue-%E5%85%83%E4%BB%B6%E6%AA%94-%E4%BD%BF%E7%94%A8-http-vue-loader/"/>
+    <id>https://kuro.tw/posts/2017/07/11/不需編譯也能載入-vue-元件檔-使用-http-vue-loader/</id>
+    <published>2017-07-10T16:16:55.000Z</published>
+    <updated>2017-07-10T16:48:08.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>上週在 Vue 社群圈有個令人興奮的熱門新聞: CodePen 可以支援 <code>.vue</code> 檔案了！</p>
+<p><blockquote class="twitter-tweet" data-lang="zh-tw"><p lang="en" dir="ltr">Check it out - you can use <code>.vue</code> files in CodePen Projects easily:<a href="https://t.co/Cd3Qr11xYQ" target="_blank" rel="external">https://t.co/Cd3Qr11xYQ</a> <a href="https://t.co/QvtIXxKRUk" target="_blank" rel="external">pic.twitter.com/QvtIXxKRUk</a></p>&mdash; Chris Coyier (@chriscoyier) <a href="https://twitter.com/chriscoyier/status/880859500185616387" target="_blank" rel="external">2017年6月30日</a></blockquote></p>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>身為使用 Vue 的開發者聽到這樣的消息當然感到相當開心，但同時也不禁感到好奇，CodePen 是如何做到不須透過 webpack 編譯 vue 檔案，就可以將 .vue 的 component 如實顯示到網頁中。</p>
+<p>大家都知道，在網頁開發的世界中，前端是沒有秘密的。 打開了開發工具，才知道原來是透過 <strong><a href="https://github.com/FranckFreiburger/http-vue-loader" target="_blank" rel="external">http-vue-loader</a></strong> 這個工具做到的。</p>
+<hr>
+
+<p><strong><a href="https://github.com/FranckFreiburger/http-vue-loader" target="_blank" rel="external">http-vue-loader</a></strong> 這套工具可提供開發者直接在網頁環境中載入 <code>.Vue</code> File，無需透過 nodeJS 環境編譯，也不需要 Build 的步驟。</p>
+<p>用法很簡單，首先在網頁上載入 Vue 與 http-vue-loader，如下</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://unpkg.com/vue"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://unpkg.com/http-vue-loader"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>接著，假設我們有一個 <code>my-component.vue</code> 的檔案：
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"hello"</span>&gt;</span>Hello &#123;&#123;who&#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></div><div class="line">module.exports = &#123;</div><div class="line">    data: function() &#123;</div><div class="line">        return &#123;</div><div class="line">            who: 'world'</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="undefined"></span></div><div class="line">.hello &#123;</div><div class="line">    background-color: #ffe;</div><div class="line">&#125;</div><div class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>那麼，我們就可以在 <code>components</code> 內透過 <code>httpVueLoader</code> 來載入我們的子元件：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"my-app"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">my-component</span>&gt;</span><span class="tag">&lt;/<span class="name">my-component</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="actionscript"></span></div><div class="line">  <span class="keyword">new</span> Vue(&#123;</div><div class="line">    el: <span class="string">'#my-app'</span>,</div><div class="line">    components: &#123;</div><div class="line">      <span class="string">'my-component'</span>: httpVueLoader(<span class="string">'my-component.vue'</span>)</div><div class="line">    &#125;</div><div class="line">  &#125;);</div><div class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div></pre></td></tr></table></figure>
+<p><br></p>
+<p>當然，httpVueLoader 也提供了類似 <code>Vue.component(&#39;my-component&#39;, { ... })</code> 的宣告方式:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">httpVueLoaderRegister(Vue, <span class="string">'my-component.vue'</span>);</div><div class="line"></div><div class="line"><span class="keyword">new</span> Vue(&#123;</div><div class="line">    <span class="attr">components</span>: [</div><div class="line">        <span class="string">'my-component'</span></div><div class="line">    &#125;,</div></pre></td></tr></table></figure>
+<p>或是將 httpVueLoader 當作 Plugin 來使用：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Vue.use(httpVueLoader);</div><div class="line"></div><div class="line"><span class="keyword">new</span> Vue(&#123;</div><div class="line">  <span class="attr">components</span>: &#123;</div><div class="line">      <span class="string">'my-component'</span>: <span class="string">'url:my-component.vue'</span></div><div class="line">  &#125;,</div><div class="line">  ...</div></pre></td></tr></table></figure>
+<p>甚至是 Array 的形式也可以：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">new</span> Vue(&#123;</div><div class="line">    <span class="attr">components</span>: [</div><div class="line">        <span class="string">'url:my-component.vue'</span></div><div class="line">    &#125;,</div><div class="line">    ...</div></pre></td></tr></table></figure>
+<p>需要注意的是，httpVueLoader 目前僅支援 Vue 2 以上的版本，而作者也在專案內說明， httpVueLoader 只是提供一個簡便的測試與開發環境，方便開發者不需要透過繁複的編譯過程才能使用 vue file 進行開發。 </p>
+<p>若是要發佈到線上的專案，建議還是需要透過工具編譯打包，會有更好的效能以及更佳的支援度喔。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;上週在 Vue 社群圈有個令人興奮的熱門新聞: CodePen 可以支援 &lt;code&gt;.vue&lt;/code&gt; 檔案了！&lt;/p&gt;
+&lt;p&gt;&lt;blockquote class=&quot;twitter-tweet&quot; data-lang=&quot;zh-tw&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;
+    
+    </summary>
+    
+      <category term="vue.js" scheme="https://kuro.tw/categories/vue-js/"/>
+    
+    
+      <category term="vue.js" scheme="https://kuro.tw/tags/vue-js/"/>
+    
+  </entry>
   
   <entry>
     <title>如何在 Vue-CLI 建立的開發環境呼叫跨域遠端 RESTful APIs</title>
@@ -927,39 +974,6 @@ result 代表傳入的資料， key 則是從 view 帶入的參數，這個範�
     
     
       <category term="d3.js" scheme="https://kuro.tw/tags/d3-js/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>[筆記] 阻擋 android chrome 網頁下拉自動重整頁面</title>
-    <link href="https://kuro.tw/posts/2015/05/11/note-blocking-android-chrome-page-drop-down-automatically-restructure-page/"/>
-    <id>https://kuro.tw/posts/2015/05/11/note-blocking-android-chrome-page-drop-down-automatically-restructure-page/</id>
-    <published>2015-05-11T07:00:00.000Z</published>
-    <updated>2017-06-07T08:16:45.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>早上開會時，同事提到了 Android 升級後，Chrome for Android 會出現網頁畫面在瀏覽器頂端時，往下拉會重整頁面的問題(<del>其實應該說是 Feature XD</del>)，因為這個新功能會造成網頁使用上的一些困擾，於是試了幾種方式，發現可以阻擋網頁重整的動作，趁還有印象就把它記錄下來。</p>
-<p><img src="http://user-image.logdown.io/user/3292/blog/3340/post/275711/HX5wrVYQ8WW8gkKhK8rQ_2015-05-11%2015.12.02.jpg" alt="2015-05-11 15.12.02.jpg">
-(就是這個小圈圈，看到它就代表網頁要重整了)</p>
-<p>原理其實很簡單，就是在當 chrome 已經到達網頁頂端時，而且判斷 touchmove 是往下拉時，把事件阻擋掉，就可以了。</p>
-<p>可以用 Android 試試看。
-Demo: <a href="http://jsbin.com/conuga/1/" target="_blank" rel="external">http://jsbin.com/conuga/1/</a></p>
-<p>聽說 iOS 也有類似問題，不過我手邊沒有 iPhone，所以無法測試。 orz</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">window</span>.addEventListener(<span class="string">'load'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">var</span> isWindowTop = <span class="literal">false</span>;</div><div class="line">    <span class="keyword">var</span> lastTouchY = <span class="number">0</span>;</div><div class="line"></div><div class="line">    <span class="keyword">var</span> touchStartHandler = <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</div><div class="line">        <span class="keyword">if</span> (e.touches.length !== <span class="number">1</span>) <span class="keyword">return</span>;</div><div class="line">        lastTouchY = e.touches[<span class="number">0</span>].clientY;</div><div class="line">        isWindowTop = (<span class="built_in">window</span>.pageYOffset === <span class="number">0</span>);</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="keyword">var</span> touchMoveHandler = <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</div><div class="line">        <span class="keyword">var</span> touchY = e.touches[<span class="number">0</span>].clientY;</div><div class="line">        <span class="keyword">var</span> touchYmove = touchY - lastTouchY;</div><div class="line">        lastTouchY = touchY;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (isWindowTop) &#123;</div><div class="line">            isWindowTop = <span class="literal">false</span>;</div><div class="line">            <span class="comment">// 阻擋移動事件</span></div><div class="line">            <span class="keyword">if</span> (touchYmove &gt; <span class="number">0</span>) &#123;</div><div class="line">                e.preventDefault();</div><div class="line">                <span class="keyword">return</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="built_in">document</span>.addEventListener(<span class="string">'touchstart'</span>, touchStartHandler, <span class="literal">false</span>);</div><div class="line">    <span class="built_in">document</span>.addEventListener(<span class="string">'touchmove'</span>, touchMoveHandler, <span class="literal">false</span>);</div><div class="line"></div><div class="line">&#125;);</div></pre></td></tr></table></figure>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;早上開會時，同事提到了 Android 升級後，Chrome for Android 會出現網頁畫面在瀏覽器頂端時，往下拉會重整頁面的問題(&lt;del&gt;其實應該說是 Feature XD&lt;/del&gt;)，因為這個新功能會造成網頁使用上的一些困擾，於是試了幾種方式，發現可以阻擋網
-    
-    </summary>
-    
-      <category term="android" scheme="https://kuro.tw/categories/android/"/>
-    
-    
-      <category term="android" scheme="https://kuro.tw/tags/android/"/>
-    
-      <category term="chrome" scheme="https://kuro.tw/tags/chrome/"/>
-    
-      <category term="mobile" scheme="https://kuro.tw/tags/mobile/"/>
     
   </entry>
   
