@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://kuro.tw/"/>
-  <updated>2017-07-10T16:48:08.000Z</updated>
+  <updated>2017-07-10T16:54:45.000Z</updated>
   <id>https://kuro.tw/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://kuro.tw/posts/2017/07/11/%E4%B8%8D%E9%9C%80%E7%B7%A8%E8%AD%AF%E4%B9%9F%E8%83%BD%E8%BC%89%E5%85%A5-vue-%E5%85%83%E4%BB%B6%E6%AA%94-%E4%BD%BF%E7%94%A8-http-vue-loader/"/>
     <id>https://kuro.tw/posts/2017/07/11/不需編譯也能載入-vue-元件檔-使用-http-vue-loader/</id>
     <published>2017-07-10T16:16:55.000Z</published>
-    <updated>2017-07-10T16:48:08.000Z</updated>
+    <updated>2017-07-10T16:54:45.000Z</updated>
     
     <content type="html"><![CDATA[<p>上週在 Vue 社群圈有個令人興奮的熱門新聞: CodePen 可以支援 <code>.vue</code> 檔案了！</p>
 <p><blockquote class="twitter-tweet" data-lang="zh-tw"><p lang="en" dir="ltr">Check it out - you can use <code>.vue</code> files in CodePen Projects easily:<a href="https://t.co/Cd3Qr11xYQ" target="_blank" rel="external">https://t.co/Cd3Qr11xYQ</a> <a href="https://t.co/QvtIXxKRUk" target="_blank" rel="external">pic.twitter.com/QvtIXxKRUk</a></p>&mdash; Chris Coyier (@chriscoyier) <a href="https://twitter.com/chriscoyier/status/880859500185616387" target="_blank" rel="external">2017年6月30日</a></blockquote></p>
@@ -34,7 +34,7 @@
 <p>用法很簡單，首先在網頁上載入 Vue 與 http-vue-loader，如下</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://unpkg.com/vue"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://unpkg.com/http-vue-loader"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div></pre></td></tr></table></figure>
 <p>接著，假設我們有一個 <code>my-component.vue</code> 的檔案：
-<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"hello"</span>&gt;</span>Hello &#123;&#123;who&#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></div><div class="line">module.exports = &#123;</div><div class="line">    data: function() &#123;</div><div class="line">        return &#123;</div><div class="line">            who: 'world'</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="undefined"></span></div><div class="line">.hello &#123;</div><div class="line">    background-color: #ffe;</div><div class="line">&#125;</div><div class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"hello"</span>&gt;</span>Hello &#123;&#123;who&#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span></div><div class="line"><span class="built_in">module</span>.exports = &#123;</div><div class="line">    <span class="attr">data</span>: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="keyword">return</span> &#123;</div><div class="line">            <span class="attr">who</span>: <span class="string">'world'</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="css"></span></div><div class="line"><span class="selector-class">.hello</span> &#123;</div><div class="line">    <span class="attribute">background-color</span>: <span class="number">#ffe</span>;</div><div class="line">&#125;</div><div class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></div></pre></td></tr></table></figure></p>
 <p>那麼，我們就可以在 <code>components</code> 內透過 <code>httpVueLoader</code> 來載入我們的子元件：</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"my-app"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">my-component</span>&gt;</span><span class="tag">&lt;/<span class="name">my-component</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="actionscript"></span></div><div class="line">  <span class="keyword">new</span> Vue(&#123;</div><div class="line">    el: <span class="string">'#my-app'</span>,</div><div class="line">    components: &#123;</div><div class="line">      <span class="string">'my-component'</span>: httpVueLoader(<span class="string">'my-component.vue'</span>)</div><div class="line">    &#125;</div><div class="line">  &#125;);</div><div class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div></pre></td></tr></table></figure>
 <p><br></p>
@@ -59,6 +59,8 @@
     
     
       <category term="vue.js" scheme="https://kuro.tw/tags/vue-js/"/>
+    
+      <category term="httpVueLoader" scheme="https://kuro.tw/tags/httpVueLoader/"/>
     
   </entry>
   
@@ -270,7 +272,7 @@
     <link href="https://kuro.tw/posts/2016/12/08/%E9%80%8F%E9%81%8E-VueCLI-%E5%BB%BA%E7%BD%AE%E5%B0%88%E6%A1%88%E6%99%82%EF%BC%8C%E8%87%AA%E5%8B%95%E5%88%87%E6%8F%9B-devtools-%E7%9A%84-debug-%E7%92%B0%E5%A2%83/"/>
     <id>https://kuro.tw/posts/2016/12/08/透過-VueCLI-建置專案時，自動切換-devtools-的-debug-環境/</id>
     <published>2016-12-08T03:40:00.000Z</published>
-    <updated>2017-06-07T08:16:45.000Z</updated>
+    <updated>2017-07-10T16:55:07.000Z</updated>
     
     <content type="html"><![CDATA[<p>Vue 提供了相當好用的 debug 工具 (Chrome 套件)， <a href="https://chrome.google.com/webstore/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd" target="_blank" rel="external">Vue.js devtools</a>，在安裝之後當你用 Chrome 開啟 Vue 專案時，Chrome 的開發者工具會多出一個 Vue 的 Tab，然後把 Vue Instance 裡的屬性通通列出來：</p>
 <p><img src="/static/img/vue-tool-screenshot.png"></p>
@@ -308,6 +310,8 @@
     
       <category term="vue.js" scheme="https://kuro.tw/tags/vue-js/"/>
     
+      <category term="vue-cli" scheme="https://kuro.tw/tags/vue-cli/"/>
+    
       <category term="webpack" scheme="https://kuro.tw/tags/webpack/"/>
     
       <category term="devtools" scheme="https://kuro.tw/tags/devtools/"/>
@@ -319,7 +323,7 @@
     <link href="https://kuro.tw/posts/2016/10/13/%E5%88%A9%E7%94%A8-yarn-%E5%AE%89%E8%A3%9D-vue-cli/"/>
     <id>https://kuro.tw/posts/2016/10/13/利用-yarn-安裝-vue-cli/</id>
     <published>2016-10-13T03:49:07.000Z</published>
-    <updated>2017-06-07T08:16:45.000Z</updated>
+    <updated>2017-07-10T16:54:50.000Z</updated>
     
     <content type="html"><![CDATA[<p>這兩天 JavaScript 圈子的最大新聞應該就是 Facebook 發布了一套新的 JavaScript 套件管理工具 Yarn，感覺來勢洶洶勢不可擋。
 實際花了一點時間試用，表現的確也比過去 npm 好很多，尤其過去 <code>npm install</code> 速度過慢，套件相依衝突的問題，目前在 Yarn 還沒遇到。 即使是剛開始 <code>yarn run scripts</code> 無法帶入參數的問題，在發布的第二天也快速地更新 (v0.15.1) 解決了。 👍</p>
@@ -364,6 +368,8 @@
     
     
       <category term="vue.js" scheme="https://kuro.tw/tags/vue-js/"/>
+    
+      <category term="yarn" scheme="https://kuro.tw/tags/yarn/"/>
     
   </entry>
   
