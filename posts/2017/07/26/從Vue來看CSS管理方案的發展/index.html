@@ -14,7 +14,7 @@ ga('create','UA-27126624-1','auto');ga('send','pageview');</script></head><body>
 
 
 <p>簡單來說，就是透過命名規則，來做到 CSS 架構的管理。 
-但大家都知道，訂出了 convention ，要是沒有嚴格檢查是否遵守，其實跟沒有一樣 XD</p>
+<del>但大家都知道，訂出了 convention ，要是沒有嚴格檢查是否遵守，其實跟沒有一樣 XD </del></p>
 <h2 id="CSS-Modules"><a href="#CSS-Modules" class="headerlink" title="CSS Modules"></a>CSS Modules</h2><p>所以後來出現了比較符合人性的 CSS Modules，透過工具來處理先前那些人工命名規範要做的事。
 也就是說，由 Webpack 做了 BEM 的事情。 過去 BEM 是人工手動做，而 Webpack 是交給工具自動化做，用類似 Javascript module 的方式來處理 CSS。</p>
 <p>講了大半個篇幅，終於要講到目前的主流： CSS in JS / styled-components 了。</p>
@@ -32,7 +32,7 @@ ga('create','UA-27126624-1','auto');ga('send','pageview');</script></head><body>
 但本質上仍是 all-in-JS 的變種語法糖就是了 XD</p>
 <p><img src="/static/img/vue-file.png"></p>
 <p>值得一提的是，當 style 標籤加上 <strong>scoped</strong> 屬性，那麼在 Vue 元件檔經過編譯後，會自動在元件上打上一個隨機的屬性，再透過 CSS Attribute Selector 的特性來做到 CSS scope 的切分，使得即便是在不同元件檔裡的 h1 也能有 CSS 樣式不互相干擾的效果。 當然開發起來，比起 JSX、或是 inline-style 等的方式，這種折衷的作法更合我的胃口 😁</p>
-</div><script type="text/javascript" src="/js/share.js?v=0.0.1" async></script><a data-url="https://kuro.tw/posts/2017/07/26/從Vue來看CSS管理方案的發展/" data-id="cj5knu5th0028u6t4qh0pa2dy" class="article-share-link">分享</a><div class="tags"><a href="/tags/vue-js/">vue.js</a><a href="/tags/CSS/">CSS</a></div><div class="post-nav"><a href="/posts/2017/07/11/不需編譯也能載入-vue-元件檔-使用-http-vue-loader/" class="next">不需編譯也能載入 .vue 元件檔: 使用 http-vue-loader</a></div><div id="disqus_thread"><div class="btn_click_load"><button class="disqus_click_btn">阅读评论 「请确保 disqus.com 可以正常加载」</button></div><script>var disqus_shortname = 'kurotw';
+</div><script type="text/javascript" src="/js/share.js?v=0.0.1" async></script><a data-url="https://kuro.tw/posts/2017/07/26/從Vue來看CSS管理方案的發展/" data-id="cj5knwz0i0029wnt4ekiwr6ip" class="article-share-link">分享</a><div class="tags"><a href="/tags/vue-js/">vue.js</a><a href="/tags/CSS/">CSS</a></div><div class="post-nav"><a href="/posts/2017/07/11/不需編譯也能載入-vue-元件檔-使用-http-vue-loader/" class="next">不需編譯也能載入 .vue 元件檔: 使用 http-vue-loader</a></div><div id="disqus_thread"><div class="btn_click_load"><button class="disqus_click_btn">阅读评论 「请确保 disqus.com 可以正常加载」</button></div><script>var disqus_shortname = 'kurotw';
 var disqus_identifier = 'posts/2017/07/26/從Vue來看CSS管理方案的發展/';
 var disqus_title = '從 Vue 來看 CSS 管理方案的發展';
 var disqus_url = 'https://kuro.tw/posts/2017/07/26/從Vue來看CSS管理方案的發展/';
