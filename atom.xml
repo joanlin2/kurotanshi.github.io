@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://kuro.tw/"/>
-  <updated>2017-07-10T16:54:45.000Z</updated>
+  <updated>2017-07-26T06:57:39.000Z</updated>
   <id>https://kuro.tw/</id>
   
   <author>
@@ -16,11 +16,65 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>從 Vue 來看 CSS 管理方案的發展</title>
+    <link href="https://kuro.tw/posts/2017/07/26/%E5%BE%9EVue%E4%BE%86%E7%9C%8BCSS%E7%AE%A1%E7%90%86%E6%96%B9%E6%A1%88%E7%9A%84%E7%99%BC%E5%B1%95/"/>
+    <id>https://kuro.tw/posts/2017/07/26/從Vue來看CSS管理方案的發展/</id>
+    <published>2017-07-26T06:48:26.000Z</published>
+    <updated>2017-07-26T06:57:39.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>昨天看到 caesar 大大發表的 <a href="https://blog.caesarchi.com/2017/07/25/react-css-styled-components/" target="_blank" rel="external">react &amp; CSS 另類新選擇</a>，講的其實是 styled-components + react 的 CSS 處理方案。 現今的幾個主流前端框架大多也有類似的做法，身為 Vue 的擁護者，這裡就來簡單說明一下 Vue 的處理方式。</p>
+<p>先從早期的 CSS 管理方案開始說起吧。</p>
+<h2 id="CSS-命名與架構學"><a href="#CSS-命名與架構學" class="headerlink" title="CSS 命名與架構學"></a>CSS 命名與架構學</h2><p>這麼多年來，CSS 的管理一直都是開發者的夢靨，很大的原因在於 CSS 的程式化與 JavaScript 相比其實是相對困難的，
+尤其在於 JS 至少還有它的 scope 可以切分，而 CSS 在這點是相對弱勢的，所有的 CSS 樣式都是 global，如果頁面上的模組過多，管理起來更是難以維護。
+嚴格來說，CSS 本身甚至都不能算是個程式語言。</p>
+<p>所以，早期在程式面會有所謂的 LESS, SASS, Stylus 等這樣的工具，藉由 preprocessor (預處理器) 來做編譯，可以做到繼承、重用、複寫等功能。
+另一方面，除了上述說的透過工具的預先編譯外，也有另一派人馬提倡的是，由 CSS 的命名學 / 架構論 來完成 CSS 模組的管理與複用。</p>
+<p>在幾年前 (2014) ，小弟也有針對此類 CSS 方法論在前端社群聚會做分享，有興趣的朋友可以看下面這份投影片：</p>
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/MOVEP2qBeaGyEO" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> 
+
+
+<p>簡單來說，就是透過命名規則，來做到 CSS 架構的管理。 
+但大家都知道，訂出了 convention ，要是沒有嚴格檢查是否遵守，其實跟沒有一樣 XD</p>
+<h2 id="CSS-Modules"><a href="#CSS-Modules" class="headerlink" title="CSS Modules"></a>CSS Modules</h2><p>所以後來出現了比較符合人性的 CSS Modules，透過工具來處理先前那些人工命名規範要做的事。
+也就是說，由 Webpack 做了 BEM 的事情。 過去 BEM 是人工手動做，而 Webpack 是交給工具自動化做，用類似 Javascript module 的方式來處理 CSS。</p>
+<p>講了大半個篇幅，終於要講到目前的主流： CSS in JS / styled-components 了。</p>
+<h2 id="CSS-in-JS-All-in-JS"><a href="#CSS-in-JS-All-in-JS" class="headerlink" title="CSS in JS / All in JS"></a>CSS in JS / All in JS</h2><p>CSS in JS 的概念最早是由 React 社群所提出，支持與不支持的兩派在社群當中也有著激烈的論戰。
+我過去也是反對此類做法，但目前保持中立態度看待。 XD</p>
+<p>過去我剛入行的時候，前輩大力倡導 HTML / CSS / JavaScript 三者負責的領域要切得越乾淨越好，簡單來說，inline-style 與 inline-script 都是禁止的。
+一旦 inline-style 與 inline-script 寫得越多，程式碼就會像義大利麵般攪在一起難以維護。</p>
+<p>而自從 component-based 的前端工具出現後，過去的原則漸漸被打破。
+像 React ，就有下面這樣的寫法。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> style = &#123;</div><div class="line">  <span class="string">'color'</span>: <span class="string">'red'</span>,</div><div class="line">  <span class="string">'fontSize'</span>: <span class="string">'46px'</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">const</span> clickHandler = <span class="function"><span class="params">()</span> =&gt;</span> alert(<span class="string">'hi'</span>); </div><div class="line"></div><div class="line">ReactDOM.render(</div><div class="line">  &lt;h1 style=&#123;style&#125; onclick=&#123;clickHandler&#125;&gt;</div><div class="line">     Hello, world!</div><div class="line">  &lt;/h1&gt;,</div><div class="line">  <span class="built_in">document</span>.getElementById(<span class="string">'example'</span>)</div><div class="line">);</div></pre></td></tr></table></figure>
+<p>將一個網頁元件 (H1) 的<strong>樣式、事件與結構，通通封裝在一份程式碼</strong>當中。</p>
+<p>而 Vue 也有類似的做法，像 Vue 提供的 Vue 元件檔：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">h1</span> @<span class="attr">click</span>=<span class="string">"clickHandler"</span>&gt;</span>&#123;&#123; msg &#125;&#125;<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span></div><div class="line"><span class="built_in">module</span>.exports = &#123;</div><div class="line">  <span class="attr">data</span>: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> &#123;</div><div class="line">      <span class="attr">msg</span>: <span class="string">'Hello, world!'</span></div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line">  <span class="attr">methods</span>:&#123;</div><div class="line">    clickHandler()&#123;</div><div class="line">      alert(<span class="string">'hi'</span>);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">scoped</span>&gt;</span><span class="undefined"></span></div><div class="line">h1 &#123;</div><div class="line">  color: red;</div><div class="line">  font-size: 46px;</div><div class="line">&#125;</div><div class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>在 Vue 元件檔，透過上面這樣的方式提供了一個 template (HTML)、script 以及帶有 scoped 的 style 樣式，也仍然可以保有過去 HTML、CSS 與 JS 分離的開發體驗。
+但本質上仍是 all-in-JS 的變種語法糖就是了 XD</p>
+<p><img src="/static/img/vue-file.png"></p>
+<p>值得一提的是，當 style 標籤加上 <strong>scoped</strong> 屬性，那麼在 Vue 元件檔經過編譯後，會自動在元件上打上一個隨機的屬性，再透過 CSS Attribute Selector 的特性來做到 CSS scope 的切分，使得即便是在不同元件檔裡的 h1 也能有 CSS 樣式不互相干擾的效果。 當然開發起來，比起 JSX、或是 inline-style 等的方式，這種折衷的作法更合我的胃口 😁</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;昨天看到 caesar 大大發表的 &lt;a href=&quot;https://blog.caesarchi.com/2017/07/25/react-css-styled-components/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;react &amp;amp;
+    
+    </summary>
+    
+      <category term="vue.js" scheme="https://kuro.tw/categories/vue-js/"/>
+    
+    
+      <category term="vue.js" scheme="https://kuro.tw/tags/vue-js/"/>
+    
+      <category term="CSS" scheme="https://kuro.tw/tags/CSS/"/>
+    
+  </entry>
+  
+  <entry>
     <title>不需編譯也能載入 .vue 元件檔: 使用 http-vue-loader</title>
     <link href="https://kuro.tw/posts/2017/07/11/%E4%B8%8D%E9%9C%80%E7%B7%A8%E8%AD%AF%E4%B9%9F%E8%83%BD%E8%BC%89%E5%85%A5-vue-%E5%85%83%E4%BB%B6%E6%AA%94-%E4%BD%BF%E7%94%A8-http-vue-loader/"/>
     <id>https://kuro.tw/posts/2017/07/11/不需編譯也能載入-vue-元件檔-使用-http-vue-loader/</id>
     <published>2017-07-10T16:16:55.000Z</published>
-    <updated>2017-07-10T16:54:45.000Z</updated>
+    <updated>2017-07-12T07:44:40.000Z</updated>
     
     <content type="html"><![CDATA[<p>上週在 Vue 社群圈有個令人興奮的熱門新聞: CodePen 可以支援 <code>.vue</code> 檔案了！</p>
 <p><blockquote class="twitter-tweet" data-lang="zh-tw"><p lang="en" dir="ltr">Check it out - you can use <code>.vue</code> files in CodePen Projects easily:<a href="https://t.co/Cd3Qr11xYQ" target="_blank" rel="external">https://t.co/Cd3Qr11xYQ</a> <a href="https://t.co/QvtIXxKRUk" target="_blank" rel="external">pic.twitter.com/QvtIXxKRUk</a></p>&mdash; Chris Coyier (@chriscoyier) <a href="https://twitter.com/chriscoyier/status/880859500185616387" target="_blank" rel="external">2017年6月30日</a></blockquote></p>
@@ -69,7 +123,7 @@
     <link href="https://kuro.tw/posts/2017/06/07/%E5%A6%82%E4%BD%95%E5%9C%A8-Vue-CLI-%E5%BB%BA%E7%AB%8B%E7%9A%84%E9%96%8B%E7%99%BC%E7%92%B0%E5%A2%83%E5%91%BC%E5%8F%AB%E8%B7%A8%E5%9F%9F%E9%81%A0%E7%AB%AF-RESTful-APIs/"/>
     <id>https://kuro.tw/posts/2017/06/07/如何在-Vue-CLI-建立的開發環境呼叫跨域遠端-RESTful-APIs/</id>
     <published>2017-06-07T10:14:00.000Z</published>
-    <updated>2017-06-07T10:40:38.000Z</updated>
+    <updated>2017-07-12T07:44:40.000Z</updated>
     
     <content type="html"><![CDATA[<p>前幾天在 VueTW 活動結束後，有朋友來問：Vue 的開發環境能不能在 local 端建立 proxy 服務來解決跨域讀取後端的 API，
 <del>隔壁棚的 Angular CLI 好像有這功能</del>，<a href="https://github.com/vuejs/vue-cli" target="_blank" rel="external">Vue-CLI</a> 是不是也能做到。</p>
@@ -165,7 +219,7 @@
     <link href="https://kuro.tw/posts/2017/05/30/VueJS-V2-%E5%9C%A8-v-for-%E5%88%97%E8%A1%A8%E5%AE%8C%E6%88%90%E5%88%86%E9%A0%81%E5%8A%9F%E8%83%BD/"/>
     <id>https://kuro.tw/posts/2017/05/30/VueJS-V2-在-v-for-列表完成分頁功能/</id>
     <published>2017-05-30T09:00:00.000Z</published>
-    <updated>2017-06-07T08:16:45.000Z</updated>
+    <updated>2017-07-12T07:44:40.000Z</updated>
     
     <content type="html"><![CDATA[<p>Vue 2 都發行半年多了，直到最近有網友留言這才想起一直沒更新裡面的內容，囧。</p>
 <p>延續上回 <a href="https://kuro.tw/posts/2016/05/30/vuejs-in-v-for-through-the-filter-in-the-list-complete-search-and-page-functions/">[VueJS] 在 v-for 列表中透過 filter 完成搜尋與分頁的功能</a> 這篇的說明，
@@ -229,7 +283,7 @@
     <link href="https://kuro.tw/posts/2017/04/04/%E7%AD%86%E8%A8%98-Google-%E8%A1%97%E6%99%AF-API-%E5%8A%A0%E5%85%A5%E5%9C%96%E6%A8%99%E8%88%87%E8%A7%92%E5%BA%A6%E8%A8%88%E7%AE%97/"/>
     <id>https://kuro.tw/posts/2017/04/04/筆記-Google-街景-API-加入圖標與角度計算/</id>
     <published>2017-04-04T07:10:00.000Z</published>
-    <updated>2017-06-07T08:16:45.000Z</updated>
+    <updated>2017-07-12T07:44:40.000Z</updated>
     
     <content type="html"><![CDATA[<p>相信大家都知道 Google Map 在多年以前就開放了「街景檢視」這樣的服務，當然 Google Map API 也提供了給開發者使用相關的 API 服務：「<a target="_blank" href="https://developers.google.com/maps/documentation/javascript/streetview">Street View Service</a>」來開發地圖的應用。</p>
 <p>除了原本在 Google Map 上面就有的街景檢視之外，透過 Street View API 開發者可以自由地在街景地圖上加入標示項，作法就跟平時在地圖上加入 marker 一樣：</p>
@@ -272,7 +326,7 @@
     <link href="https://kuro.tw/posts/2016/12/08/%E9%80%8F%E9%81%8E-VueCLI-%E5%BB%BA%E7%BD%AE%E5%B0%88%E6%A1%88%E6%99%82%EF%BC%8C%E8%87%AA%E5%8B%95%E5%88%87%E6%8F%9B-devtools-%E7%9A%84-debug-%E7%92%B0%E5%A2%83/"/>
     <id>https://kuro.tw/posts/2016/12/08/透過-VueCLI-建置專案時，自動切換-devtools-的-debug-環境/</id>
     <published>2016-12-08T03:40:00.000Z</published>
-    <updated>2017-07-10T16:55:07.000Z</updated>
+    <updated>2017-07-12T07:44:40.000Z</updated>
     
     <content type="html"><![CDATA[<p>Vue 提供了相當好用的 debug 工具 (Chrome 套件)， <a href="https://chrome.google.com/webstore/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd" target="_blank" rel="external">Vue.js devtools</a>，在安裝之後當你用 Chrome 開啟 Vue 專案時，Chrome 的開發者工具會多出一個 Vue 的 Tab，然後把 Vue Instance 裡的屬性通通列出來：</p>
 <p><img src="/static/img/vue-tool-screenshot.png"></p>
@@ -323,7 +377,7 @@
     <link href="https://kuro.tw/posts/2016/10/13/%E5%88%A9%E7%94%A8-yarn-%E5%AE%89%E8%A3%9D-vue-cli/"/>
     <id>https://kuro.tw/posts/2016/10/13/利用-yarn-安裝-vue-cli/</id>
     <published>2016-10-13T03:49:07.000Z</published>
-    <updated>2017-07-10T16:54:50.000Z</updated>
+    <updated>2017-07-12T07:44:40.000Z</updated>
     
     <content type="html"><![CDATA[<p>這兩天 JavaScript 圈子的最大新聞應該就是 Facebook 發布了一套新的 JavaScript 套件管理工具 Yarn，感覺來勢洶洶勢不可擋。
 實際花了一點時間試用，表現的確也比過去 npm 好很多，尤其過去 <code>npm install</code> 速度過慢，套件相依衝突的問題，目前在 Yarn 還沒遇到。 即使是剛開始 <code>yarn run scripts</code> 無法帶入參數的問題，在發布的第二天也快速地更新 (v0.15.1) 解決了。 👍</p>
@@ -378,7 +432,7 @@
     <link href="https://kuro.tw/posts/2016/10/11/%E7%AD%86%E8%A8%98-%E9%80%8F%E9%81%8E-Composition-Events-%E5%A2%9E%E5%BC%B7%E9%9D%9E%E6%8B%89%E4%B8%81%E8%AA%9E%E7%B3%BB%E8%BC%B8%E5%85%A5%E6%B3%95%E5%B0%8D%E8%BC%B8%E5%85%A5%E6%A1%86%E7%9A%84%E6%94%AF%E6%8F%B4/"/>
     <id>https://kuro.tw/posts/2016/10/11/筆記-透過-Composition-Events-增強非拉丁語系輸入法對輸入框的支援/</id>
     <published>2016-10-11T04:57:30.000Z</published>
-    <updated>2017-06-07T08:16:45.000Z</updated>
+    <updated>2017-07-12T07:44:40.000Z</updated>
     
     <content type="html"><![CDATA[<p>最近在爬 Vue 的原始碼的時候，意外發現兩個沒看過的 event：<code>compositionstart</code> 與 <code>compositionend</code>。 查了一下 MDN 才發現這些叫做「<a href="https://developer.mozilla.org/en-US/docs/Web/API/CompositionEvent" title="Composition Events" target="_blank" rel="external">Composition Events</a>」的 event 是從 DOM Level 3 之後才新增的。</p>
 <p>介紹 Composition Events 之前先來談談 DOM API 過去對輸入框偵測變化的幾個方式。</p>
@@ -434,7 +488,7 @@
     <link href="https://kuro.tw/posts/2016/10/05/VueJS-%E5%90%84%E7%A8%AE%E8%B3%87%E6%96%99%E7%B6%81%E5%AE%9A-data-binding-%E7%9A%84%E6%96%B9%E5%BC%8F/"/>
     <id>https://kuro.tw/posts/2016/10/05/VueJS-各種資料綁定-data-binding-的方式/</id>
     <published>2016-10-05T01:04:34.000Z</published>
-    <updated>2017-06-07T08:16:45.000Z</updated>
+    <updated>2017-07-12T07:44:40.000Z</updated>
     
     <content type="html"><![CDATA[<p>大部分資料是從這裡來的: <a href="https://github.com/vuejs/vue/wiki/1.0.0-binding-syntax-cheatsheet" target="_blank" rel="external">Vue 1.0.0 binding syntax cheatsheet</a>，再加上對 Vue 2.0 補充的部分。</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- normal directive --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">v-if</span>=<span class="string">"ok"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- directive with argument --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">v-on:click</span>=<span class="string">"onClick"</span>&gt;</span><span class="tag">&lt;/<span class="name">button</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- v-on with argument + key modifier --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">v-on:keyup.enter</span>=<span class="string">"handleEnter"</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- literal modifier: pass literal string to directive for Vue 1.x, --&gt;</span></div><div class="line"><span class="comment">&lt;!-- but deprecated in 2.0 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">v-link.literal</span>=<span class="string">"/a/b/c"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- binding an attribute with v-bind --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">v-bind:src</span>=<span class="string">"imgSrc"</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">v-bind:href</span>=<span class="string">"baseURL + '/path'"</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- shorthand: colon for v-bind --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">:src</span>=<span class="string">"imgSrc"</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">:href</span>=<span class="string">"baseURL + '/path'"</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- shorthand: @ for v-on --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">button</span> @<span class="attr">click</span>=<span class="string">"onClick"</span>&gt;</span><span class="tag">&lt;/<span class="name">button</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- key modifier --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">input</span> @<span class="attr">keyup.enter</span>=<span class="string">"handleEnter"</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- stop/prevent modifier --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">button</span> @<span class="attr">click.stop</span>=<span class="string">"onClick"</span>&gt;</span><span class="tag">&lt;/<span class="name">button</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">form</span> @<span class="attr">submit.prevent</span>&gt;</span><span class="tag">&lt;/<span class="name">form</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- props for Vue 1.x --&gt;</span></div><div class="line"><span class="comment">&lt;!-- .once and .sync are deprecated in 2.0 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">my-comp</span></span></div><div class="line">  <span class="attr">prop</span>=<span class="string">"literal string"</span></div><div class="line">  <span class="attr">v-bind:prop</span>=<span class="string">"defaultOneWay"</span></div><div class="line">  <span class="attr">v-bind:prop.sync</span>=<span class="string">"twoWay"</span></div><div class="line">  <span class="attr">v-bind:prop.once</span>=<span class="string">"oneTime"</span>&gt;</div><div class="line"><span class="tag">&lt;/<span class="name">my-comp</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- props with one time binding for Vue 2.0 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">my-comp</span></span></div><div class="line">  <span class="attr">prop</span>=<span class="string">"literal string"</span></div><div class="line">  <span class="attr">v-bind:prop</span>=<span class="string">"defaultOneWay"</span></div><div class="line">  <span class="attr">v-once</span>&gt;</div><div class="line"><span class="tag">&lt;/<span class="name">my-comp</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- component with props and custom events, in shorthand --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">item-list</span></span></div><div class="line">  <span class="attr">:items</span>=<span class="string">"items"</span></div><div class="line">  <span class="attr">:open.sync</span>=<span class="string">"isListOpen"</span></div><div class="line">  @<span class="attr">ready</span>=<span class="string">"onItemsReady"</span></div><div class="line">  @<span class="attr">update</span>=<span class="string">"onItemsUpdate"</span>&gt;</div><div class="line"><span class="tag">&lt;/<span class="name">item-list</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- v-el and v-ref now just use the argument --&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- registers vm.$refs.child for Vue 1.x --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">comp</span> <span class="attr">v-ref:child</span>&gt;</span><span class="tag">&lt;/<span class="name">comp</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- registers vm.$refs.child for Vue 2.0 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">comp</span> <span class="attr">ref:child</span>&gt;</span><span class="tag">&lt;/<span class="name">comp</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- registers vm.$els.node for Vue 1.x, but deprecated in 2.0 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">v-el:node</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>]]></content>
@@ -457,7 +511,7 @@
     <link href="https://kuro.tw/posts/2016/10/03/VueJS-V1-%E8%88%87-V2-%E5%85%83%E4%BB%B6%E5%AF%A6%E9%AB%94%E4%B9%8B%E5%B7%AE%E7%95%B0/"/>
     <id>https://kuro.tw/posts/2016/10/03/VueJS-V1-與-V2-元件實體之差異/</id>
     <published>2016-10-03T10:20:01.000Z</published>
-    <updated>2017-06-07T08:16:45.000Z</updated>
+    <updated>2017-07-12T07:44:40.000Z</updated>
     
     <content type="html"><![CDATA[<p>狂賀！ <a href="https://github.com/vuejs/vue/releases/tag/v2.0.0" title="Vue 2.0" target="_blank" rel="external">Vue 2.0</a> 終於正式發佈！</p>
 <p>關於 Vue 2.0 的新特性，作者也在官方 Blog - <a href="https://medium.com/the-vue-point/vue-2-0-is-here-ef1f26acf4b8#.n0m3yjfmp" title="Vue 2.0 is Here!" target="_blank" rel="external">Vue 2.0 is Here!</a> (<a href="http://jiongks.name/blog/vue-2-is-here/" title="Vue 2.0 来了！" target="_blank" rel="external">中文翻譯</a>) 一文中敘述地相當詳細，這裡就不多說。</p>
@@ -533,7 +587,7 @@ VueJS 2.0 的 virtual DOM 機制，是採用 <a href="https://github.com/snabbdo
     <link href="https://kuro.tw/posts/2016/09/30/Vue-2-0-%E5%8D%87%E7%B4%9A%E5%B0%8F%E5%B9%AB%E6%89%8B-Vue-migration-helper/"/>
     <id>https://kuro.tw/posts/2016/09/30/Vue-2-0-升級小幫手-Vue-migration-helper/</id>
     <published>2016-09-30T14:38:01.000Z</published>
-    <updated>2017-06-07T08:16:45.000Z</updated>
+    <updated>2017-07-12T07:44:40.000Z</updated>
     
     <content type="html"><![CDATA[<p>Vue JS 自今年四月 (2016/04) 發佈 Vue 2.0 preview 版本至今也有五個月了，在新舊版本的交替之中，開發者最關心的一定是「<strong>我的專案能不能升到 Vue 2.0</strong>」、「<strong>升上去會不會爆</strong>」、「<strong>專案該用那個版本來開發</strong>」，<del>「聽說隔壁那個 ng 升級幾乎等於砍掉重練」</del> 之類的問題。</p>
 <p>不過幸好，Vue 1.0 與 Vue 2.0 有 90% 的 API 是相同的，過去在 Vue 1.x 的核心概念到 Vue 2.0 一樣可以沿用，而且又多了些新特性。</p>
@@ -568,7 +622,7 @@ VueJS 2.0 的 virtual DOM 機制，是採用 <a href="https://github.com/snabbdo
     <link href="https://kuro.tw/posts/2016/05/30/vuejs-in-v-for-through-the-filter-in-the-list-complete-search-and-page-functions/"/>
     <id>https://kuro.tw/posts/2016/05/30/vuejs-in-v-for-through-the-filter-in-the-list-complete-search-and-page-functions/</id>
     <published>2016-05-30T06:30:00.000Z</published>
-    <updated>2017-06-07T08:16:45.000Z</updated>
+    <updated>2017-07-12T07:44:40.000Z</updated>
     
     <content type="html"><![CDATA[<p>最近 <a href="https://vuejs.org/" target="_blank" rel="external">Vue.js</a> 正夯，所以手上幾個東西打算用這個來改寫，關於 Vue.js 的基本介紹可以參考小弟的投影片，這裡就不再贅述。</p>
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/DLQDvLrRSNunsY" width="476" height="400" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:10px; max-width: 100%;" allowfullscreen> </iframe>
@@ -609,7 +663,7 @@ result 代表傳入的資料， key 則是從 view 帶入的參數，這個範�
     <link href="https://kuro.tw/posts/2015/12/20/use-d3js-to-create-responsive-histogram/"/>
     <id>https://kuro.tw/posts/2015/12/20/use-d3js-to-create-responsive-histogram/</id>
     <published>2015-12-19T22:02:00.000Z</published>
-    <updated>2017-06-07T08:16:45.000Z</updated>
+    <updated>2017-07-12T07:44:40.000Z</updated>
     
     <content type="html"><![CDATA[<p>利用 d3.js 我們可以很輕易地產生我們想要的圖表，以最常見的長條圖為例，只要透過 scale (比例尺) 與 axis (軸線)，再加上一點 SVG 的基礎知識，像這樣的長條圖一下子就可以生成。</p>
 <p><img src="http://user-image.logdown.io/user/3292/blog/3340/post/378297/2V8wHgLUTEawU5iJstYS_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-12-20%20%E4%B8%8B%E5%8D%8812.21.25.png" alt="螢幕快照 2015-12-20 下午12.21.25.png">
@@ -675,7 +729,7 @@ result 代表傳入的資料， key 則是從 view 帶入的參數，這個範�
     <link href="https://kuro.tw/posts/2015/10/15/using-google-fusion-table-without-writing-code-or-topic-maps/"/>
     <id>https://kuro.tw/posts/2015/10/15/using-google-fusion-table-without-writing-code-or-topic-maps/</id>
     <published>2015-10-14T18:16:00.000Z</published>
-    <updated>2017-06-07T08:16:45.000Z</updated>
+    <updated>2017-07-12T07:44:40.000Z</updated>
     
     <content type="html"><![CDATA[<p>感謝台北市政府以及<a href="https://www.facebook.com/photo.php?fbid=10204828212414899&amp;set=a.1357755313713.2044236.1526408898&amp;type=3" target="_blank" rel="external">相關人士的努力</a>，在十月中旬的時候，台北市 open data 平台又開放了「<a href="http://data.taipei/opendata/datalist/datasetMeta?oid=68785231-d6c5-47a1-b001-77eec70bec02" target="_blank" rel="external">台北市住宅竊盜點位資訊</a>」這樣的資料，雖然很多人戲稱房價又要下跌了，但是老話一句，身為<del>有良心的開發者，當然居住安全比房價什麼的還要重要得多</del>。</p>
 <p>那麼，拿到這份資料我們可以怎麼玩呢?
@@ -740,7 +794,7 @@ result 代表傳入的資料， key 則是從 view 帶入的參數，這個範�
     <link href="https://kuro.tw/posts/2015/09/30/use-google-map-view-rainfall-simulation-of-flooding-in-taipei-city-map/"/>
     <id>https://kuro.tw/posts/2015/09/30/use-google-map-view-rainfall-simulation-of-flooding-in-taipei-city-map/</id>
     <published>2015-09-29T20:00:00.000Z</published>
-    <updated>2017-06-07T08:16:45.000Z</updated>
+    <updated>2017-07-12T07:44:40.000Z</updated>
     
     <content type="html"><![CDATA[<p>看到前兩天的新聞: <a href="https://tw.news.yahoo.com/%E6%9F%AF%E6%96%87%E5%93%B2%E6%83%B3%E5%85%AC%E9%96%8B%E6%98%93%E6%B7%B9%E6%B0%B4%E5%9C%B0%E5%8D%80-%E5%8C%97%E5%B8%82%E5%BA%9C%E5%B7%B2%E4%B8%8A%E7%B6%B2-115016390.html" title="柯文哲想公開易淹水地區 北市府已上網" target="_blank" rel="external">柯文哲想公開易淹水地區 北市府已上網</a>，又剛好有前輩寫了一篇 <a href="http://gis.rchss.sinica.edu.tw/qgis/?p=3221" title="利用QGIS檢視台北市降雨淹水模擬圖" target="_blank" rel="external">利用QGIS檢視台北市降雨淹水模擬圖</a>，<del>雖然身處房仲業，但身為有良心的開發者不能只想著房價</del>，心想應也可透過 Google Map 來呈現，於是試了一下，順便寫篇記錄。</p>
 <p>首先從<a href="http://data.taipei/opendata/datalist/datasetMeta?oid=fa1e8012-ebb4-473b-888e-97f9a9ce365e" title="臺北市政府資料開放平台" target="_blank" rel="external">臺北市政府資料開放平台</a>將所需的資料一一下載下來，格式是 kmz (其實就是 zip 壓縮)。在解壓縮後可以得到 doc.kml 檔案。 接著，雖然 Google maps API 有提供 <a href="https://developers.google.com/maps/documentation/javascript/examples/layer-kml" title="Google maps API KML Layers" target="_blank" rel="external">KML Layers</a> 的圖層嵌套，但轉出來的 kml 檔似乎要稍作修改後才能透過 KML Layers 套用在 Google map 上，這裏我選擇另一種做法: 將 kml 轉為 geoJSON 後使用。</p>
@@ -774,7 +828,7 @@ result 代表傳入的資料， key 則是從 view 帶入的參數，這個範�
     <link href="https://kuro.tw/posts/2015/07/08/note-javascript-variables-declared-with-the-scope-scope/"/>
     <id>https://kuro.tw/posts/2015/07/08/note-javascript-variables-declared-with-the-scope-scope/</id>
     <published>2015-07-08T02:11:00.000Z</published>
-    <updated>2017-06-07T08:16:45.000Z</updated>
+    <updated>2017-07-12T07:44:40.000Z</updated>
     
     <content type="html"><![CDATA[<p>大家都知道，JavaScript 的變數有其作用域的範圍，若使用前未經 var 宣告，就會自動變成全域變數 (global variable)，而在其 code block 內宣告的變數也只有該 code block 內可以使用。</p>
 <p>這次的問題，其實很久以前在 tonyQ 的聚會上就聽他說過了，<del>只是沒想到還真的會遇到 XDDDD</del></p>
@@ -811,7 +865,7 @@ result 代表傳入的資料， key 則是從 view 帶入的參數，這個範�
     <link href="https://kuro.tw/posts/2015/06/18/taipei-d3js-meetup-gathering-to-share-experiences/"/>
     <id>https://kuro.tw/posts/2015/06/18/taipei-d3js-meetup-gathering-to-share-experiences/</id>
     <published>2015-06-18T05:32:00.000Z</published>
-    <updated>2017-06-07T08:16:45.000Z</updated>
+    <updated>2017-07-12T07:44:40.000Z</updated>
     
     <content type="html"><![CDATA[<p>這次我在 <a href="http://www.meetup.com/Taipei-D3-js-Meetup/" title="Taipei D3.js Meetup" target="_blank" rel="external">Taipei D3.js Meetup</a> (現在似乎改叫 Visual Thursday) 分享的 Talk 是有關於地理視覺化的簡介，雖然題目聽起來很學術，但其實內容是我這陣子對於 Web GIS 以及地圖視覺化的一些摸索心得分享。</p>
 <p>感謝台灣微軟提供場地 XD</p>
@@ -847,7 +901,7 @@ result 代表傳入的資料， key 則是從 view 帶入的參數，這個範�
     <link href="https://kuro.tw/posts/2015/06/11/js-note-twd97-convert-to-longitude-and-latitude/"/>
     <id>https://kuro.tw/posts/2015/06/11/js-note-twd97-convert-to-longitude-and-latitude/</id>
     <published>2015-06-11T03:18:00.000Z</published>
-    <updated>2017-06-07T08:16:45.000Z</updated>
+    <updated>2017-07-12T07:44:40.000Z</updated>
     
     <content type="html"><![CDATA[<p>因為從臺北市政府資料開放平台 API 拿到的資料是 TWD97 座標格式，所以我們必須要將它轉成經緯度後才能套用至 Google Map 使用。網路上查了很多資料，最後找到最親民的是米蟲大的 PHP 版本，於是就改成寫我最熟悉的 JS。</p>
 <p>reference:
@@ -878,7 +932,7 @@ result 代表傳入的資料， key 則是從 view 帶入的參數，這個範�
     <link href="https://kuro.tw/posts/2015/05/20/added-to-the-google-map-images-d3-2/"/>
     <id>https://kuro.tw/posts/2015/05/20/added-to-the-google-map-images-d3-2/</id>
     <published>2015-05-20T07:49:00.000Z</published>
-    <updated>2017-06-07T08:16:45.000Z</updated>
+    <updated>2017-07-12T07:44:40.000Z</updated>
     
     <content type="html"><![CDATA[<p><a href="http://kuro.tw/posts/2015/05/20/join-the-d3-in-google-map-image" title="在 Google Map 加入 D3 圖像 ">上一篇</a>提到了如何在 Google Map 裡面加入 D3 的圖像，這次我們實際將資料套進去吧。</p>
 <p>資料來源是上篇提到的<a href="http://data.taipei/opendata/datalist/datasetMeta?oid=1d71c478-205f-42c5-8386-35f86d74fdd1" target="_blank" rel="external">臺北捷運各站進出量統計</a>的統計資料，因為台北市政府開放平台並沒有提供 CORS (跨來源資源共享)的服務，沒關係，我們直接將資料下載存成 json 檔案即可。 (範例為 2015/4 進出站人數)</p>
@@ -915,7 +969,7 @@ result 代表傳入的資料， key 則是從 view 帶入的參數，這個範�
     <link href="https://kuro.tw/posts/2015/05/19/join-the-d3-in-google-map-image/"/>
     <id>https://kuro.tw/posts/2015/05/19/join-the-d3-in-google-map-image/</id>
     <published>2015-05-19T08:05:00.000Z</published>
-    <updated>2017-06-07T08:16:45.000Z</updated>
+    <updated>2017-07-12T07:44:40.000Z</updated>
     
     <content type="html"><![CDATA[<p>因為昨天 <a href="http://data.taipei/" target="_blank" rel="external">台北市政府開放平台</a> 開始提供 <a href="http://data.taipei/opendata/datalist/datasetMeta?oid=1d71c478-205f-42c5-8386-35f86d74fdd1" target="_blank" rel="external">臺北捷運各站進出量統計</a> 的統計資料，所以就在思考可以利用這份資料做什麼應用，第一個想到的就是能否透過 D3 與地圖的共同呈現，當然就從我最熟悉的 Google Map 開始。</p>
 <p>不過這篇文章只會介紹到如何在 Google Map 加入 D3 (SVG) 圖像。
@@ -947,37 +1001,6 @@ result 代表傳入的資料， key 則是從 view 帶入的參數，這個範�
     
     
       <category term="google map" scheme="https://kuro.tw/tags/google-map/"/>
-    
-      <category term="d3.js" scheme="https://kuro.tw/tags/d3-js/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Modern WebConf 2015 與我的講題：D3 圖表優化二三事</title>
-    <link href="https://kuro.tw/posts/2015/05/17/modern-webconf-2015-with-my-theme-d3-optimizing-two-or-three-things/"/>
-    <id>https://kuro.tw/posts/2015/05/17/modern-webconf-2015-with-my-theme-d3-optimizing-two-or-three-things/</id>
-    <published>2015-05-17T05:59:00.000Z</published>
-    <updated>2017-06-07T08:16:45.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>下面投影片是這次小弟在 Modern WebConf 2015 分享的主題，內容是有關 D3 開發的一些心得。</p>
-<p>其實早先在準備的時候有些忐忑，像這種大拜拜的演講場合，很難預想聽眾的程度，講題太深擔心會眾無法吸收，太淺又怕對不起會眾的期待。 所以這次的內容安排了三分之一是從最基礎的 D3 data-driven 講起，再來才是開發心得與特性的介紹，期望不管是剛入門的朋友或是已經投入開發的老手都能從中獲得些什麼。因為我認為 Data-Driven 是 D3.js 的核心觀念之一，在瞭解如何將資料轉為 DOM / SVG 元件以後，剩下再去讀 D3 的 API 相信也能輕易上手。</p>
-<p><a href="http://audrey.nu/-/2015/05/16/open-source-enlightenment-2015" title="開源之道 2015 " target="_blank" rel="external">「萬事萬物都有缺口，缺口就是光的入口」</a>，如果有什麼是我講的不對的地方，也歡迎 <del>用力打臉</del> 糾正，畢竟我都這麼厚臉皮出來分享了，讓小弟我有機會獲得正確答案應該不過分，哈哈哈。</p>
-<p>最後，在這裡預告一下，感謝 <a href="http://www.meetup.com/Taipei-D3-js-Meetup/" title="Taipei D3.js Meetup" target="_blank" rel="external">Taipei D3.js Meetup</a> 的邀約，預計在六月份會有一場小聚的分享，題目還在構思當中。 如果你對 D3 相關議題也有興趣，歡迎與我交流。 :)</p>
-<p>無論如何，還是感謝每一位參與 Modern WebConf 的會眾、講師以及工作人員。辛苦了。</p>
-<p><iframe src="//www.slideshare.net/slideshow/embed_code/key/NdKfJWerFlauo9" width="510" height="420" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/kurotanshi/d3-48180820" title="[Modern WebConf 2015] D3 圖表優化二三事" target="_blank">[Modern WebConf 2015] D3 圖表優化二三事</a> </strong> from <strong><a href="//www.slideshare.net/kurotanshi" target="_blank">Kuro Hsu</a></strong> </div></p>
-<p><div style="margin-top:2em;">偷偷在底下擺張 JavaScript 之父 Brendan Eich，與小弟 <del>(自稱 JS 之子)</del> 的合照炫耀一下 XD</div>
-<img src="http://user-image.logdown.io/user/3292/blog/3340/post/276313/SIxIklSuRka61onbK0IK_IMG_8751.jpg" alt="IMG_8751.jpg"></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;下面投影片是這次小弟在 Modern WebConf 2015 分享的主題，內容是有關 D3 開發的一些心得。&lt;/p&gt;
-&lt;p&gt;其實早先在準備的時候有些忐忑，像這種大拜拜的演講場合，很難預想聽眾的程度，講題太深擔心會眾無法吸收，太淺又怕對不起會眾的期待。 所以這次的內容安排了
-    
-    </summary>
-    
-      <category term="ModernWebConf" scheme="https://kuro.tw/categories/ModernWebConf/"/>
-    
     
       <category term="d3.js" scheme="https://kuro.tw/tags/d3-js/"/>
     
