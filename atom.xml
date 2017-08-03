@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://kuro.tw/"/>
-  <updated>2017-07-26T08:26:36.000Z</updated>
+  <updated>2017-08-03T06:32:51.000Z</updated>
   <id>https://kuro.tw/</id>
   
   <author>
@@ -14,6 +14,44 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>在 Vue-Cli 取得 jsonp 的方式</title>
+    <link href="https://kuro.tw/posts/2017/08/03/%E5%9C%A8-Vue-Cli-%E5%8F%96%E5%BE%97-jsonp-%E7%9A%84%E6%96%B9%E5%BC%8F/"/>
+    <id>https://kuro.tw/posts/2017/08/03/在-Vue-Cli-取得-jsonp-的方式/</id>
+    <published>2017-08-03T06:04:48.000Z</published>
+    <updated>2017-08-03T06:32:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>如果你是從 V1 就開始用 Vue 開發的朋友，一定知道 Vue.js 重要的核心特性就是只關注於 view layout 的呈現與 Components 系統，提供最小化且必要的功能給開發者。
+其他的功能都可以自由選用第三方套件來完成，這也是為什麼被稱為「漸進式框架」的原因。</p>
+<p>所以，如果我們用 Vue.js 來開發網站，且想使用 ajax 從遠端取得資源的時候，也許有些人會選用 jQuery ($.get / $.ajax ...等) ，也有些人會用 vue-resource 來做搭配。 早期官方推薦 <a href="https://github.com/pagekit/vue-resource" target="_blank" rel="external">vue-resource</a>，到了 V2 官方的推薦 lib 改為 <a href="https://github.com/mzabriskie/axios" target="_blank" rel="external">Axios</a> 或是直接用<a href="https://developer.mozilla.org/zh-TW/docs/Web/API/Fetch_API" target="_blank" rel="external">原生 Fetch API</a>。</p>
+<p>不過很可惜，除了<del>包山包海</del>的 jQuery 之外，其他目前都還不支援 jsonp 這樣的做法。 也就是說，如果你的專案上需要用到 jsonp ，而且又不希望掛上一大包的 jQuery，這裡有個簡單的套件可以幫助你。 (順便自己筆記)</p>
+<hr>
+
+<p>首先先安裝 jsonp 這個套件。</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ npm <span class="keyword">install </span><span class="keyword">jsonp </span>--save</div></pre></td></tr></table></figure>
+<p>或</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ yarn <span class="keyword">add</span><span class="bash"> jsonp</span></div></pre></td></tr></table></figure>
+<p>然後在你的程式碼內這樣使用：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> jsonp <span class="keyword">from</span> <span class="string">'jsonp'</span></div><div class="line"></div><div class="line">jsonp(<span class="string">'http://www.example.com/foo'</span>, &#123; <span class="comment">/* DATA HERE */</span> &#125;,</div><div class="line">  <span class="function"><span class="keyword">function</span> (<span class="params">err, data</span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span> (err) &#123;</div><div class="line">      <span class="built_in">console</span>.error(err.message);</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">      <span class="built_in">console</span>.log(data);</div><div class="line">    &#125;</div><div class="line">  &#125;);</div></pre></td></tr></table></figure>
+<p>就可以了。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;如果你是從 V1 就開始用 Vue 開發的朋友，一定知道 Vue.js 重要的核心特性就是只關注於 view layout 的呈現與 Components 系統，提供最小化且必要的功能給開發者。
+其他的功能都可以自由選用第三方套件來完成，這也是為什麼被稱為「漸進式框架」的原
+    
+    </summary>
+    
+      <category term="vue.js" scheme="https://kuro.tw/categories/vue-js/"/>
+    
+    
+      <category term="vue.js" scheme="https://kuro.tw/tags/vue-js/"/>
+    
+      <category term="jsonp" scheme="https://kuro.tw/tags/jsonp/"/>
+    
+  </entry>
   
   <entry>
     <title>從 Vue 來看 CSS 管理方案的發展</title>
@@ -952,48 +990,6 @@ result 代表傳入的資料， key 則是從 view 帶入的參數，這個範�
     <summary type="html">
     
       &lt;p&gt;&lt;a href=&quot;http://kuro.tw/posts/2015/05/20/join-the-d3-in-google-map-image&quot; title=&quot;在 Google Map 加入 D3 圖像 &quot;&gt;上一篇&lt;/a&gt;提到了如何在 Google Map 裡面加入 D3
-    
-    </summary>
-    
-      <category term="D3.js" scheme="https://kuro.tw/categories/D3-js/"/>
-    
-    
-      <category term="google map" scheme="https://kuro.tw/tags/google-map/"/>
-    
-      <category term="d3.js" scheme="https://kuro.tw/tags/d3-js/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>在 Google Map 加入 D3 圖像</title>
-    <link href="https://kuro.tw/posts/2015/05/19/join-the-d3-in-google-map-image/"/>
-    <id>https://kuro.tw/posts/2015/05/19/join-the-d3-in-google-map-image/</id>
-    <published>2015-05-19T08:05:00.000Z</published>
-    <updated>2017-07-12T07:44:40.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>因為昨天 <a href="http://data.taipei/" target="_blank" rel="external">台北市政府開放平台</a> 開始提供 <a href="http://data.taipei/opendata/datalist/datasetMeta?oid=1d71c478-205f-42c5-8386-35f86d74fdd1" target="_blank" rel="external">臺北捷運各站進出量統計</a> 的統計資料，所以就在思考可以利用這份資料做什麼應用，第一個想到的就是能否透過 D3 與地圖的共同呈現，當然就從我最熟悉的 Google Map 開始。</p>
-<p>不過這篇文章只會介紹到如何在 Google Map 加入 D3 (SVG) 圖像。
-等我將捷運各站資訊加入後也許會還有下回，哈哈哈。</p>
-<p>先看結果 - Demo: <a href="http://output.jsbin.com/wexiva/1/" target="_blank" rel="external">http://output.jsbin.com/wexiva/1/</a>
-<img src="http://user-image.logdown.io/user/3292/blog/3340/post/276547/NyZaTlSTDuH8v6DRzWAY_%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202015-05-19%20%E4%B8%8B%E5%8D%8811.34.22.png" alt="螢幕快照 2015-05-19 下午11.34.22.png"></p>
-<p>整個程式非常簡單，首先在 Google map 加入一個 <code>google.maps.OverlayView()</code>，然後透過 <code>d3.csv</code> 載入資料。在繪製 marker (圓點) 的時候，透過自訂的 <code>transform function</code> 去指定它的座標就完成了。</p>
-<p>相關程式如下:</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="comment">// 捷運各站經緯度資訊: https://dl.dropboxusercontent.com/u/12537630/mrt.csv</span></div><div class="line"><span class="comment">// 資料來源: https://github.com/repeat/taipei-metro-stations</span></div><div class="line"></div><div class="line">d3.csv(<span class="string">"https://dl.dropboxusercontent.com/u/12537630/mrt.csv"</span>, <span class="function"><span class="keyword">function</span>(<span class="params">data</span>)</span>&#123;</div><div class="line">  <span class="keyword">var</span> overlay = <span class="keyword">new</span> google.maps.OverlayView();</div><div class="line"></div><div class="line">  <span class="comment">// 新增 OverlayView 到 google map</span></div><div class="line">  overlay.onAdd = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> layer = d3.select(<span class="keyword">this</span>.getPanes().overlayLayer).append(<span class="string">"div"</span>)</div><div class="line">        .attr(<span class="string">"class"</span>, <span class="string">"stations"</span>);</div><div class="line"></div><div class="line">    overlay.draw = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">      <span class="keyword">var</span> projection = <span class="keyword">this</span>.getProjection(), padding = <span class="number">16</span>;</div><div class="line"></div><div class="line">      <span class="keyword">var</span> marker = layer.selectAll(<span class="string">"svg"</span>)</div><div class="line">          .data(d3.entries(data))</div><div class="line">          .each(transform)</div><div class="line">          .enter().append(<span class="string">"svg:svg"</span>)</div><div class="line">            .each(transform)</div><div class="line">            .attr(<span class="string">"class"</span>, <span class="string">"marker"</span>);</div><div class="line"></div><div class="line">      <span class="comment">// 加入圓點</span></div><div class="line">      marker.append(<span class="string">"svg:circle"</span>)</div><div class="line">          .attr(<span class="string">"r"</span>, <span class="number">6</span>)</div><div class="line">          .attr(<span class="string">"cx"</span>, padding)</div><div class="line">          .attr(<span class="string">"cy"</span>, padding);</div><div class="line"></div><div class="line">      <span class="comment">// 加入標籤</span></div><div class="line">      marker.append(<span class="string">"svg:text"</span>)</div><div class="line">          .attr(<span class="string">"x"</span>, padding + <span class="number">7</span>)</div><div class="line">          .attr(<span class="string">"y"</span>, padding)</div><div class="line">          .attr(<span class="string">"dy"</span>, <span class="string">".31em"</span>)</div><div class="line">          .text(<span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123; <span class="keyword">return</span> d.value.name; &#125;);</div><div class="line"></div><div class="line">      <span class="comment">// transform function. 指定每個點的座標.</span></div><div class="line">      <span class="function"><span class="keyword">function</span> <span class="title">transform</span>(<span class="params">d</span>) </span>&#123;</div><div class="line">        d = <span class="keyword">new</span> google.maps.LatLng(d.value.lat, d.value.lng);</div><div class="line">        d = projection.fromLatLngToDivPixel(d);</div><div class="line">        <span class="keyword">return</span> d3.select(<span class="keyword">this</span>)</div><div class="line">            .style(<span class="string">"left"</span>, (d.x - padding) + <span class="string">"px"</span>)</div><div class="line">            .style(<span class="string">"top"</span>, (d.y - padding) + <span class="string">"px"</span>);</div><div class="line">      &#125;</div><div class="line">    &#125;;</div><div class="line">  &#125;;</div><div class="line"></div><div class="line">  <span class="comment">// 將 overlay 加入到 google 地圖</span></div><div class="line">  overlay.setMap(map);</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<h4 id="參考"><a href="#參考" class="headerlink" title="參考:"></a>參考:</h4><ul>
-<li><a href="http://bl.ocks.org/mbostock/899711" target="_blank" rel="external">http://bl.ocks.org/mbostock/899711</a></li>
-<li><a href="https://developers.google.com/maps/documentation/javascript/customoverlays?hl=zh-tw" target="_blank" rel="external">https://developers.google.com/maps/documentation/javascript/customoverlays?hl=zh-tw</a></li>
-</ul>
-<hr>
-<h4 id="本系列文章列表"><a href="#本系列文章列表" class="headerlink" title="本系列文章列表:"></a>本系列文章列表:</h4><ul>
-<li><a href="http://kuro.tw/posts/2015/05/20/join-the-d3-in-google-map-image">在 Google Map 加入 D3 圖像 (1)</a></li>
-<li><a href="http://kuro.tw/posts/2015/05/20/added-to-the-google-map-images-d3-2">在 Google Map 加入 D3 圖像 (2)</a></li>
-</ul>
-<hr>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;因為昨天 &lt;a href=&quot;http://data.taipei/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;台北市政府開放平台&lt;/a&gt; 開始提供 &lt;a href=&quot;http://data.taipei/opendata/datalist/datase
     
     </summary>
     
