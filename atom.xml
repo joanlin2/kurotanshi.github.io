@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://kuro.tw/"/>
-  <updated>2017-08-03T06:32:51.000Z</updated>
+  <updated>2017-08-07T07:52:23.000Z</updated>
   <id>https://kuro.tw/</id>
   
   <author>
@@ -16,11 +16,11 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>在 Vue-Cli 取得 jsonp 的方式</title>
+    <title>在 Vue 取得 jsonp 的方式</title>
     <link href="https://kuro.tw/posts/2017/08/03/%E5%9C%A8-Vue-Cli-%E5%8F%96%E5%BE%97-jsonp-%E7%9A%84%E6%96%B9%E5%BC%8F/"/>
     <id>https://kuro.tw/posts/2017/08/03/在-Vue-Cli-取得-jsonp-的方式/</id>
     <published>2017-08-03T06:04:48.000Z</published>
-    <updated>2017-08-03T06:32:51.000Z</updated>
+    <updated>2017-08-07T07:52:23.000Z</updated>
     
     <content type="html"><![CDATA[<p>如果你是從 V1 就開始用 Vue 開發的朋友，一定知道 Vue.js 重要的核心特性就是只關注於 view layout 的呈現與 Components 系統，提供最小化且必要的功能給開發者。
 其他的功能都可以自由選用第三方套件來完成，這也是為什麼被稱為「漸進式框架」的原因。</p>
